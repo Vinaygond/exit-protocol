@@ -4,7 +4,7 @@
 
 {% block landing_content %}
 <style>
-    /* Forensic / Legal Theme */
+    /* Forensic / Legal Theme - Mobile Optimized */
     :root {
         --navy-dark: #0f172a;
         --navy-light: #1e293b;
@@ -13,6 +13,10 @@
         --bg-offwhite: #f8fafc;
     }
     
+    html, body {
+        overflow-x: hidden; /* STOP Horizontal Scroll */
+    }
+
     body {
         font-family: 'Inter', sans-serif;
         background-color: var(--bg-offwhite);
@@ -28,14 +32,15 @@
     .navbar-landing {
         background: white;
         border-bottom: 1px solid #e2e8f0;
-        padding: 1.25rem 0;
+        padding: 1rem 0;
     }
 
     /* Hero Section */
     .hero-section {
-        padding: 6rem 0;
+        padding: 4rem 0; /* Reduced padding for mobile */
         background: white;
         border-bottom: 1px solid #e2e8f0;
+        overflow: hidden; /* Contains the layout */
     }
     
     /* Calculator Card */
@@ -43,8 +48,9 @@
         background: var(--navy-dark);
         color: white;
         border-radius: 12px;
-        padding: 2.5rem;
-        box-shadow: 0 20px 40px -5px rgba(0,0,0,0.3);
+        padding: 2rem;
+        /* Optimized shadow for mobile performance */
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.2); 
     }
     
     .btn-gold {
@@ -54,25 +60,26 @@
         border: none;
         padding: 12px 28px;
         border-radius: 6px;
-        transition: all 0.2s;
+        transition: transform 0.1s;
     }
-    .btn-gold:hover {
-        background-color: #92400e;
-        color: white;
-        transform: translateY(-1px);
+    .btn-gold:active {
+        transform: scale(0.98);
     }
 
     .stat-card {
         background: white;
         border: 1px solid #e2e8f0;
-        padding: 2rem;
+        padding: 1.5rem;
         border-radius: 12px;
         height: 100%;
-        transition: transform 0.2s;
     }
-    .stat-card:hover {
-        transform: translateY(-5px);
-        border-color: var(--gold-accent);
+    
+    /* CRITICAL FIX: Chart Container */
+    .chart-wrapper {
+        position: relative;
+        height: 300px; /* Force fixed height */
+        width: 100%;
+        margin: 0 auto;
     }
 </style>
 
@@ -82,9 +89,9 @@
         <a class="navbar-brand brand-font fw-bold text-dark fs-4" href="#">
             <i class="bi bi-shield-check text-warning me-2"></i>EXIT<span class="text-warning">PROTOCOL</span>
         </a>
-        <div class="d-flex gap-3">
-            <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-sm px-4 fw-medium">Client Login</a>
-            <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-sm px-4 fw-bold">Initialize Audit</a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-sm px-3 fw-medium">Log In</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-sm px-3 fw-bold">Start</a>
         </div>
     </div>
 </nav>
@@ -94,23 +101,23 @@
     <div class="container">
         <div class="row align-items-center g-5">
             <div class="col-lg-6">
-                <div class="d-inline-flex align-items-center border border-secondary rounded-pill px-3 py-1 mb-4">
+                <div class="d-inline-flex align-items-center border border-secondary rounded-pill px-3 py-1 mb-3">
                     <span class="badge bg-warning text-dark me-2">CONFIDENTIAL</span>
                     <span class="small text-muted text-uppercase fw-bold" style="font-size: 0.7rem;">High Asset Protection</span>
                 </div>
-                <h1 class="display-4 fw-bold mb-4 brand-font lh-sm text-dark">
+                <h1 class="display-5 fw-bold mb-3 brand-font lh-sm text-dark">
                     Protecting Wealth in the <br>
                     <span class="text-warning">Age of Separation.</span>
                 </h1>
-                <p class="lead text-muted mb-5">
+                <p class="lead text-muted mb-4 fs-6">
                     Divorce is the single largest destroyer of personal net worth. 
                     The <strong>Exit Protocol</strong> is a forensic infrastructure for high-earners facing the 50% cliff.
                 </p>
-                <div class="d-flex gap-3">
-                    <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-lg px-5 shadow-sm">
+                <div class="d-grid d-md-flex gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-lg shadow-sm">
                         Start Forensic Trace
                     </a>
-                    <a href="#roi-calculator" class="btn btn-outline-secondary btn-lg px-4">
+                    <a href="#roi-calculator" class="btn btn-outline-secondary btn-lg">
                         Calculate Risk
                     </a>
                 </div>
@@ -126,12 +133,16 @@
                         <h6 class="fw-bold mb-0 text-dark">Asset Exposure Analysis</h6>
                     </div>
                     <div class="card-body p-4">
-                        <canvas id="threatChart" height="220"></canvas>
-                        <div class="alert alert-warning mt-4 mb-0 border-0 bg-warning bg-opacity-10 text-dark d-flex">
-                            <i class="bi bi-exclamation-triangle-fill me-3 mt-1"></i>
+                        <!-- FIX: Wrapped in fixed container -->
+                        <div class="chart-wrapper">
+                            <canvas id="threatChart"></canvas>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-4 mb-0 border-0 bg-warning bg-opacity-10 text-dark d-flex align-items-start">
+                            <i class="bi bi-exclamation-triangle-fill me-3 mt-1 flex-shrink-0"></i>
                             <div>
                                 <strong>The "50% Cliff":</strong><br>
-                                <span class="small">Without LIBR tracing, commingled assets are presumed marital property. Legal fees average $25k+ for manual forensic accounting.</span>
+                                <span class="small">Without LIBR tracing, commingled assets are presumed marital property.</span>
                             </div>
                         </div>
                     </div>
@@ -146,7 +157,7 @@
     <div class="container py-5">
         <div class="text-center mb-5">
             <h2 class="fw-bold brand-font text-dark">The Silent Struggle</h2>
-            <p class="text-muted">Analyzed from 50,000+ anonymous high-net-worth discussions.</p>
+            <p class="text-muted small">Analyzed from 50,000+ anonymous high-net-worth discussions.</p>
         </div>
         <div class="row g-4">
             <div class="col-md-4">
@@ -192,7 +203,7 @@
                         <input type="number" id="netWorthInput" class="form-control bg-dark text-white border-secondary border-start-0" value="500000" placeholder="500000">
                     </div>
                     
-                    <button onclick="calculateROI()" class="btn btn-warning w-100 btn-lg fw-bold mb-4">
+                    <button onclick="calculateROI()" class="btn btn-warning w-100 btn-lg fw-bold mb-4 shadow-sm">
                         Calculate Potential Loss
                     </button>
                     
@@ -200,18 +211,17 @@
                         <div class="row text-center g-3">
                             <div class="col-6 border-end border-secondary">
                                 <small class="text-white-50 d-block mb-1 text-uppercase" style="font-size: 0.7rem;">Unprotected Loss</small>
-                                <h3 class="text-danger fw-bold mb-0" id="lossValue">$-</h3>
+                                <h3 class="text-danger fw-bold mb-0 fs-4" id="lossValue">$-</h3>
                             </div>
                             <div class="col-6">
                                 <small class="text-white-50 d-block mb-1 text-uppercase" style="font-size: 0.7rem;">Protocol Savings</small>
-                                <h3 class="text-success fw-bold mb-0" id="savingsValue">$-</h3>
+                                <h3 class="text-success fw-bold mb-0 fs-4" id="savingsValue">$-</h3>
                             </div>
                         </div>
                         <div class="text-center mt-4">
                             <div class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2">
                                 PROJECTED ROI: 12,400%
                             </div>
-                            <p class="text-white-50 small mt-2 mb-0">Based on standard legal fee reduction & asset retention.</p>
                         </div>
                     </div>
                 </div>
@@ -235,7 +245,7 @@
 
 {% block extra_js %}
 <script>
-    // Chart.js - The Threat Chart
+    // Chart.js - The Threat Chart (Mobile Optimized)
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('threatChart').getContext('2d');
         new Chart(ctx, {
@@ -244,17 +254,24 @@
                 labels: ['Your Share', 'Spouse Share', 'Legal Fees'],
                 datasets: [{
                     data: [40, 40, 20],
-                    backgroundColor: ['#0f172a', '#cbd5e1', '#b45309'], // Navy, Gray, Gold
+                    backgroundColor: ['#0f172a', '#cbd5e1', '#b45309'], 
                     borderWidth: 0,
                     hoverOffset: 4
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, // Allows chart to fill the 300px container exactly
                 cutout: '70%',
                 plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                    legend: { 
+                        position: 'bottom', 
+                        labels: { 
+                            usePointStyle: true, 
+                            padding: 20,
+                            font: { size: 11 } 
+                        } 
+                    }
                 }
             }
         });
@@ -264,21 +281,14 @@
     function calculateROI() {
         const netWorth = parseFloat(document.getElementById('netWorthInput').value) || 0;
         
-        // Logic: 50% loss without protocol. 5% savings with protocol (conservative).
         const loss = netWorth * 0.50;
         const savings = netWorth * 0.05;
         
         document.getElementById('lossValue').innerText = "$" + loss.toLocaleString();
         document.getElementById('savingsValue').innerText = "$" + savings.toLocaleString();
         
-        // Show results with fade-in effect
         const results = document.getElementById('resultsArea');
         results.classList.remove('d-none');
-        results.style.opacity = 0;
-        setTimeout(() => { 
-            results.style.transition = 'opacity 0.5s';
-            results.style.opacity = 1; 
-        }, 10);
     }
 </script>
 {% endblock %}
