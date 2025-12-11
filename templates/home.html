@@ -1,138 +1,130 @@
 {% extends 'base.html' %}
 
-{% block title %}Exit Protocol | Capital Preservation Systems{% endblock %}
+{% block title %}Exit Protocol | Forensic Asset Tracing{% endblock %}
 
 {% block landing_content %}
 <style>
-    /* "Private Client" Theme */
+    /* MATCHING THE DASHBOARD AESTHETIC */
     :root {
-        --wealth-navy: #0f172a;  /* Deep Slate/Navy */
-        --wealth-gold: #c5a059;  /* Muted Metallic Gold */
-        --wealth-paper: #f8f9fa; /* Off-white */
-        --text-primary: #334155;
-        --border-color: #e2e8f0;
+        /* Derived from your screenshots */
+        --brand-navy: #0f172a;   /* The Sidebar Color */
+        --brand-gold: #f59e0b;   /* The "Protocol" Color */
+        --brand-blue: #0066FF;   /* The "Tracked Assets" Card Color */
+        --brand-bg: #f8fafc;     /* The Dashboard Background */
+        --text-dark: #1e293b;
     }
     
     body {
         background-color: #ffffff;
-        color: var(--text-primary);
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: var(--text-dark);
+        font-family: 'Inter', sans-serif;
     }
 
     .brand-font {
-        font-family: 'Playfair Display', serif;
-        letter-spacing: -0.01em;
+        font-family: 'Playfair Display', serif; /* Matches "Main Checking" header */
     }
 
-    /* Navbar */
+    /* Navbar - Matches your Sidebar Logo */
     .navbar-custom {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid var(--border-color);
-        padding: 1.25rem 0;
+        background-color: var(--brand-navy);
+        padding: 1.2rem 0;
     }
+    .navbar-brand {
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+        color: white !important;
+    }
+    .brand-accent { color: var(--brand-gold); }
 
-    /* Hero */
+    /* Hero Section */
     .hero-section {
-        padding: 8rem 0 6rem;
-        background: radial-gradient(circle at 80% 20%, #f1f5f9 0%, #ffffff 60%);
-        border-bottom: 1px solid var(--border-color);
+        background-color: var(--brand-navy); /* Seamless transition from nav */
+        color: white;
+        padding: 6rem 0 8rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    /* The "Blue Card" effect from your Dashboard */
+    .hero-card {
+        background-color: var(--brand-blue);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     }
 
-    /* Buttons */
     .btn-gold {
-        background-color: var(--wealth-navy);
-        color: var(--wealth-gold);
-        border: 1px solid var(--wealth-navy);
-        padding: 14px 36px;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        border-radius: 2px;
-        transition: all 0.3s ease;
+        background-color: var(--brand-gold);
+        color: #000;
+        font-weight: 600;
+        border: none;
+        padding: 12px 32px;
+        border-radius: 6px;
+        transition: transform 0.2s;
     }
     .btn-gold:hover {
-        background-color: transparent;
-        color: var(--wealth-navy);
+        background-color: #fbbf24;
+        transform: translateY(-2px);
+        color: #000;
     }
 
-    .btn-outline-navy {
-        background-color: transparent;
-        color: var(--wealth-navy);
-        border: 1px solid var(--border-color);
-        padding: 14px 36px;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 1.5px;
-        border-radius: 2px;
-        transition: all 0.3s ease;
+    .btn-outline-light-custom {
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 12px 32px;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s;
     }
-    .btn-outline-navy:hover {
-        border-color: var(--wealth-navy);
+    .btn-outline-light-custom:hover {
+        background: rgba(255,255,255,0.1);
+        border-color: white;
+        color: white;
     }
 
-    /* Feature Cards */
+    /* Feature Grid - Matches your "Summary Cards" */
+    .feature-section {
+        margin-top: -4rem; /* Overlap effect */
+        position: relative;
+        z-index: 10;
+    }
+    
     .feature-card {
-        padding: 3rem 2rem;
-        border-right: 1px solid var(--border-color);
-        border-bottom: 1px solid var(--border-color);
-        transition: background 0.3s;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 2rem;
+        height: 100%;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s;
     }
     .feature-card:hover {
-        background-color: #fafafa;
-    }
-    .feature-number {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.5rem;
-        color: var(--wealth-gold);
-        margin-bottom: 1rem;
-        display: block;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 
-    /* Chart Container */
-    .forensic-chart-wrapper {
-        background: white;
-        border: 1px solid var(--border-color);
-        padding: 2rem;
-        box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
-        position: relative;
+    .icon-box {
+        width: 48px; height: 48px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
     }
-    .badge-forensic {
-        position: absolute;
-        top: 1.5rem;
-        right: 1.5rem;
-        background: var(--wealth-navy);
-        color: white;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        padding: 4px 10px;
-        letter-spacing: 1px;
-    }
+    .icon-blue { background: #eff6ff; color: var(--brand-blue); }
+    .icon-gold { background: #fffbeb; color: var(--brand-gold); }
+    .icon-red { background: #fef2f2; color: #ef4444; }
 </style>
 
-<!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+<!-- Navbar (Dark like Sidebar) -->
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
     <div class="container">
-        <a class="navbar-brand brand-font fw-bold fs-4 text-dark" href="#">
-            EXIT<span style="color: var(--wealth-gold);">PROTOCOL</span>
+        <a class="navbar-brand brand-font fw-bold" href="#">
+            <i class="bi bi-shield-check brand-accent me-2"></i>EXIT<span class="brand-accent">PROTOCOL</span>
         </a>
-        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto align-items-center">
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase small fw-bold text-muted ls-1 mx-3" href="#methodology">Methodology</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-uppercase small fw-bold text-muted ls-1 mx-3" href="{% url 'accounts:login' %}">Client Login</a>
-                </li>
-                <li class="nav-item ms-3">
-                    <a href="{% url 'accounts:register' %}" class="btn-gold">Initialize Audit</a>
-                </li>
-            </ul>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'accounts:login' %}" class="text-white text-decoration-none small text-uppercase fw-bold opacity-75">Client Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn-gold py-2 px-4 text-uppercase" style="font-size: 0.75rem;">Initialize</a>
         </div>
     </div>
 </nav>
@@ -141,53 +133,52 @@
 <section class="hero-section">
     <div class="container">
         <div class="row align-items-center">
-            <div class="col-lg-5">
-                <div class="d-inline-flex align-items-center mb-4 border-bottom border-dark pb-2">
-                    <span class="text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 2px; color: var(--wealth-navy);">
-                        Wealth Defense Systems
-                    </span>
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="d-inline-flex align-items-center border border-secondary rounded-pill px-3 py-1 mb-4">
+                    <span class="badge bg-warning text-dark me-2">LIVE</span>
+                    <span class="small text-white-50 text-uppercase ls-1" style="font-size: 0.7rem;">Automated Forensic Accounting</span>
                 </div>
-                
-                <h1 class="display-4 brand-font fw-bold mb-4 text-dark" style="line-height: 1.1;">
-                    Preserve the integrity of your separate estate.
+                <h1 class="display-4 brand-font fw-bold mb-4">
+                    Don't let commingling cost you your inheritance.
                 </h1>
-                
-                <p class="text-muted mb-5 lead" style="font-size: 1.15rem; line-height: 1.7;">
-                    In high-stakes litigation, ambiguity is a liability. 
-                    Exit Protocol provides <strong>automated forensic tracing</strong> to establish an immutable chain of custody for your net worth.
+                <p class="lead text-white-50 mb-5" style="max-width: 500px;">
+                    The courts assume your separate property is gone the moment it touches a joint account. 
+                    <strong>Exit Protocol</strong> uses the LIBR algorithm to mathematically prove what is yours.
                 </p>
-                
-                <div class="d-flex flex-column flex-sm-row gap-3">
-                    <a href="{% url 'accounts:register' %}" class="btn-gold text-center">
-                        Start Forensic Trace
+                <div class="d-flex gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn-gold">
+                        Start Forensic Audit
                     </a>
-                    <a href="#how-it-works" class="btn-outline-navy text-center">
-                        View Sample Report
+                    <a href="#demo" class="btn-outline-light-custom">
+                        How It Works
                     </a>
                 </div>
-                
-                <p class="mt-4 small text-muted">
-                    <i class="bi bi-shield-check me-1" style="color: var(--wealth-gold);"></i> 
-                    Bank-Grade Encryption &bull; Local Processing &bull; Court Admissible
-                </p>
+                <div class="mt-4 pt-2 d-flex align-items-center text-white-50 small">
+                    <i class="bi bi-lock-fill me-2"></i> 
+                    <span>Bank-Grade Encryption & Chain of Custody</span>
+                </div>
             </div>
             
-            <div class="col-lg-6 offset-lg-1 mt-5 mt-lg-0">
-                <!-- Visual: The LIBR Chart -->
-                <div class="forensic-chart-wrapper">
-                    <span class="badge-forensic">Exhibit A: Asset Tracing</span>
-                    
-                    <div class="mb-4">
-                        <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem; letter-spacing: 1px;">Account: J. Doe - Main Trust</small>
-                        <h3 class="brand-font mb-0 mt-1">$2,450,000.00</h3>
-                        <div class="text-success small"><i class="bi bi-arrow-up-right"></i> Traceable via LIBR</div>
+            <!-- Visual: Mimics your "Tracked Assets" Blue Card -->
+            <div class="col-lg-5 offset-lg-1">
+                <div class="hero-card">
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div>
+                            <small class="text-white-50 text-uppercase fw-bold">Traceable Assets</small>
+                            <h2 class="fw-bold mb-0 mt-1">$452,150.00</h2>
+                            <small class="text-white-50">Across 4 Accounts</small>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded p-2">
+                            <i class="bi bi-bank fs-4"></i>
+                        </div>
                     </div>
-                    
-                    <canvas id="heroChart" height="220"></canvas>
-                    
-                    <div class="mt-4 pt-3 border-top d-flex justify-content-between text-muted small">
-                        <span>Algorithm: LIBR (Standard)</span>
-                        <span>Analysis: <span class="text-success fw-bold">Verified</span></span>
+                    <!-- Mini Chart Visualization -->
+                    <canvas id="miniChart" height="150" class="mb-3"></canvas>
+                    <div class="p-3 bg-black bg-opacity-25 rounded border border-white border-opacity-10">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="small"><i class="bi bi-check-circle-fill text-warning me-2"></i>LIBR Analysis</span>
+                            <span class="badge bg-success bg-opacity-75">Verified</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,117 +186,82 @@
     </div>
 </section>
 
-<!-- The Methodology -->
-<section id="methodology" class="border-bottom">
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <div class="col-lg-3 feature-card bg-light">
-                <span class="feature-number">01</span>
-                <h4 class="brand-font mb-3">Ingest</h4>
-                <p class="small text-muted mb-0">
-                    Securely upload native PDF bank statements. Our parser extracts thousands of transaction lines instantly, creating a structured ledger without manual data entry.
-                </p>
+<!-- Features Grid (Overlapping) -->
+<section class="feature-section mb-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Feature 1 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box icon-blue">
+                        <i class="bi bi-file-earmark-arrow-up"></i>
+                    </div>
+                    <h5 class="brand-font fw-bold mb-3">1. Ingest</h5>
+                    <p class="text-muted small mb-0">
+                        Drag-and-drop PDF bank statements. Our engine extracts thousands of transactions instantly, handling messy formats that break Excel.
+                    </p>
+                </div>
             </div>
-            <div class="col-lg-3 feature-card">
-                <span class="feature-number">02</span>
-                <h4 class="brand-font mb-3">Trace</h4>
-                <p class="small text-muted mb-0">
-                    The system applies the <strong>Lowest Intermediate Balance Rule (LIBR)</strong> chronologically. It detects every instance where marital spending dipped into separate funds.
-                </p>
+            <!-- Feature 2 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box icon-red">
+                        <i class="bi bi-graph-down"></i>
+                    </div>
+                    <h5 class="brand-font fw-bold mb-3">2. Trace (LIBR)</h5>
+                    <p class="text-muted small mb-0">
+                        The system replays history chronologically. It detects every "Dip" where marital spending permanently reduced your separate property claim.
+                    </p>
+                </div>
             </div>
-            <div class="col-lg-3 feature-card bg-light">
-                <span class="feature-number">03</span>
-                <h4 class="brand-font mb-3">Prove</h4>
-                <p class="small text-muted mb-0">
-                    Generate a formal PDF report detailing the exact provenance of funds. Includes a cryptographic chain of custody log for evidentiary submission.
-                </p>
-            </div>
-            <div class="col-lg-3 feature-card">
-                <span class="feature-number">04</span>
-                <h4 class="brand-font mb-3">Defend</h4>
-                <p class="small text-muted mb-0">
-                    Utilize our AI-powered communication firewall to neutralize hostile correspondence, ensuring your reputational standing remains unimpeachable.
-                </p>
+            <!-- Feature 3 -->
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="icon-box icon-gold">
+                        <i class="bi bi-file-pdf"></i>
+                    </div>
+                    <h5 class="brand-font fw-bold mb-3">3. Report</h5>
+                    <p class="text-muted small mb-0">
+                        Generate a court-admissible PDF ("Exhibit A"). Includes Executive Summary, Dip Analysis, and a cryptographic Chain of Custody.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- The "Agitation" Section -->
-<section class="py-5 bg-white">
+<!-- Social Proof / Agitation -->
+<section class="py-5">
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h2 class="brand-font display-6 mb-4">The Cost of Commingling</h2>
+                <h2 class="brand-font display-6 fw-bold mb-4 text-dark">The "Cost of Commingling"</h2>
                 <p class="lead text-muted mb-5">
-                    Without a forensic audit, the legal presumption is a 50/50 division of all commingled accounts. 
-                    <span style="color: var(--wealth-navy); font-weight: 600;">Exit Protocol shifts the burden of proof back in your favor.</span>
+                    Without a forensic audit, the legal presumption is a 50/50 division. 
+                    A forensic accountant charges $5,000+ retainer and takes weeks. 
+                    <span class="text-dark fw-bold">Exit Protocol does it in minutes.</span>
                 </p>
-            </div>
-        </div>
-        
-        <div class="row g-4 mt-2">
-            <div class="col-md-6">
-                <div class="p-4 border bg-light h-100">
-                    <div class="d-flex mb-3">
-                        <i class="bi bi-x-circle text-danger fs-4 me-3"></i>
-                        <h5 class="fw-bold">The Standard Approach</h5>
-                    </div>
-                    <ul class="list-unstyled text-muted small mb-0">
-                        <li class="mb-2">&bull; Manual Excel entry by paralegals ($200/hr)</li>
-                        <li class="mb-2">&bull; Weeks of delay for basic analysis</li>
-                        <li class="mb-2">&bull; "He said, She said" arguments over assets</li>
-                        <li class="mb-2">&bull; Emotional, reactive communication</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="p-4 border border-dark bg-white h-100 position-relative">
-                    <div class="position-absolute top-0 end-0 bg-dark text-white px-2 py-1 small fw-bold" style="font-size: 0.6rem;">THE PROTOCOL</div>
-                    <div class="d-flex mb-3">
-                        <i class="bi bi-check-circle-fill fs-4 me-3" style="color: var(--wealth-gold);"></i>
-                        <h5 class="fw-bold">The Exit Protocol</h5>
-                    </div>
-                    <ul class="list-unstyled text-dark small mb-0">
-                        <li class="mb-2">&bull; Automated PDF ingestion & parsing</li>
-                        <li class="mb-2">&bull; Instant LIBR calculation & visualization</li>
-                        <li class="mb-2">&bull; Mathematical proof of separate property</li>
-                        <li class="mb-2">&bull; AI-filtered, court-safe correspondence</li>
-                    </ul>
-                </div>
+                <a href="{% url 'accounts:register' %}" class="btn-gold shadow-sm">
+                    Secure Your Position
+                </a>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Footer -->
-<footer class="bg-dark text-white-50 py-5">
+<footer class="bg-white border-top py-5 mt-5">
     <div class="container">
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <h5 class="text-white brand-font mb-3">EXIT<span style="color: var(--wealth-gold);">PROTOCOL</span></h5>
-                <p class="small opacity-75">
-                    Advanced litigation support systems for capital preservation.
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <span class="brand-font fw-bold fs-5 text-dark">EXIT<span class="brand-accent">PROTOCOL</span></span>
+                <p class="small text-muted mt-2 mb-0">
+                    System of Record for High-Stakes Litigation.
                 </p>
             </div>
-            <div class="col-md-2 offset-md-4 mb-4">
-                <h6 class="text-white text-uppercase small fw-bold mb-3">Platform</h6>
-                <ul class="list-unstyled small">
-                    <li class="mb-2"><a href="{% url 'accounts:login' %}" class="text-white-50 text-decoration-none">Client Login</a></li>
-                    <li class="mb-2"><a href="{% url 'accounts:register' %}" class="text-white-50 text-decoration-none">Initialize Case</a></li>
-                </ul>
+            <div class="col-md-6 text-md-end">
+                <span class="small text-muted">&copy; 2025 Exit Protocol. All rights reserved.</span>
             </div>
-            <div class="col-md-2 mb-4">
-                <h6 class="text-white text-uppercase small fw-bold mb-3">Legal</h6>
-                <ul class="list-unstyled small">
-                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
-                    <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="border-top border-secondary pt-4 mt-4 text-center small opacity-50">
-            &copy; 2025 Exit Protocol. All rights reserved. 
-            <br>Disclaimer: This software provides data analysis, not legal advice. Consult your attorney.
         </div>
     </div>
 </footer>
@@ -313,50 +269,30 @@
 
 {% block extra_js %}
 <script>
-    // Sophisticated Chart Visualization for Hero
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('heroChart').getContext('2d');
-        
-        // Gradient fill
-        let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(197, 160, 89, 0.1)'); // Gold tint
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [
-                    {
-                        label: 'Total Liquidity',
-                        data: [2500000, 2400000, 1800000, 2100000, 2300000, 2450000],
-                        borderColor: '#0f172a', // Navy
-                        borderWidth: 2,
-                        pointRadius: 0,
-                        tension: 0.1,
-                        fill: false
-                    },
-                    {
-                        label: 'Separate Property Baseline',
-                        data: [2500000, 2400000, 1800000, 1800000, 1800000, 1800000],
-                        borderColor: '#c5a059', // Gold
-                        backgroundColor: gradient,
-                        borderWidth: 2,
-                        borderDash: [5, 5],
-                        pointRadius: 0,
-                        tension: 0.1,
-                        fill: true
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                scales: { x: { display: false }, y: { display: false } },
-                layout: { padding: 10 }
-            }
-        });
+    // Mini Chart for Hero Visual
+    const ctx = document.getElementById('miniChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                data: [100, 110, 85, 120, 115, 135],
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { x: { display: false }, y: { display: false } },
+            layout: { padding: 5 }
+        }
     });
 </script>
 {% endblock %}
+
+
