@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Add Note - Exit Protocol{% endblock %}
+{% block page_title %}Add Case Note{% endblock %}
+{% block content %}
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-md-8">
+<div class="card">
+<div class="card-header">
+<h5 class="mb-0">Add Note to {{ case.case_title }}</h5>
+</div>
+<div class="card-body">
+<form method="post">
+{% csrf_token %}
+<div class="mb-3">
+<label class="form-label">Title</label>
+{% render_field form.title class="form-control" %}
+</div>
+<div class="mb-3">
+<label class="form-label">Content</label>
+{% render_field form.content class="form-control" %}
+</div>
+<div class="row">
+<div class="col-md-6 mb-3">
+<label class="form-label">Category</label>
+{% render_field form.category class="form-select" %}
+</div>
+<div class="col-md-6 mb-3">
+<div class="form-check mt-4">
+{% render_field form.is_private class="form-check-input" %}
+<label class="form-check-label">Private Note</label>
+</div>
+</div>
+</div>
+<div class="d-flex justify-content-between">
+
+<a href="{% url 'cases:case_detail' case.id %}" class="btn btn-
+secondary">Cancel</a>
+
+<button type="submit" class="btn btn-primary">Save Note</button>
+</div>
+</form>
+
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

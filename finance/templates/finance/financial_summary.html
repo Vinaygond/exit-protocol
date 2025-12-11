@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Intelligence | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h3 class="fw-bold brand-font text-dark">Financial Intelligence</h3>
+        <p class="text-muted small">Forensic breakdown of marital vs. separate property exposure.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <div class="btn-group shadow-sm">
+            <a href="{% url 'finance:account_list' %}" class="btn btn-light border text-muted">
+                <i class="bi bi-list-ul me-2"></i> All Accounts
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="bi bi-printer me-2"></i> Export Report
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- High Level Metrics -->
+<div class="row g-4 mb-5">
+    <!-- Joint Pot -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-primary bg-opacity-10">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-primary text-white">Marital Estate</span>
+                    <i class="bi bi-diagram-3-fill text-primary fs-4"></i>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">${{ summary.joint.balance|floatformat:2 }}</h2>
+                <span class="small text-muted">{{ summary.joint.count }} Joint Accounts</span>
+                <div class="progress mt-3 bg-white" style="height: 6px;">
+                    <div class="progress-bar bg-primary" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Separate (Petitioner) -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-success bg-opacity-10">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-success text-white">Your Separate Property</span>
+                    <i class="bi bi-shield-lock-fill text-success fs-4"></i>
+                </div>
+                <h2 class="fw-bold text-dark mb-1">${{ summary.petitioner.balance|floatformat:2 }}</h2>
+                <span class="small text-muted">{{ summary.petitioner.count }} Individual Accounts</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forensic Tracing Result -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-dark text-white position-relative overflow-hidden">
+            <!-- Decorative background element -->
+            <div class="position-absolute top-0 end-0 opacity-10 p-3">
+                <i class="bi bi-search" style="font-size: 5rem;"></i>
+            </div>
+            <div class="card-body p-4 position-relative">
+                <small class="text-warning text-uppercase fw-bold ls-1">LIBR Tracing Detected</small>
+                <h2 class="fw-bold mb-1 mt-2 text-white">${{ total_separate_traceable|floatformat:2 }}</h2>
+                <p class="small text-white-50 mb-0">Separate funds identified within commingled accounts.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left: Separate Property Claims (Forensics) -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-dark mb-0">Active Forensic Claims (LIBR)</h6>
+                <span class="badge bg-warning text-dark">{{ claims.count }} Claims</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-4 py-2 text-muted small text-uppercase">Source</th>
+                            <th class="py-2 text-muted small text-uppercase">Account</th>
+                            <th class="py-2 text-end text-muted small text-uppercase">Initial</th>
+                            <th class="px-4 py-2 text-end text-muted small text-uppercase">Traceable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for claim in claims %}
+                        <tr>
+                            <td class="px-4 fw-bold text-dark">
+                                {{ claim.claim_name }}
+                                <div class="small text-muted fw-normal">{{ claim.initial_deposit_date }}</div>
+                            </td>
+                            <td class="small">{{ claim.account.institution_name }}</td>
+                            <td class="text-end text-muted">${{ claim.initial_amount|floatformat:0 }}</td>
+                            <td class="px-4 text-end fw-bold text-success">
+                                ${{ claim.current_traceable_amount|floatformat:2 }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-clipboard-x fs-1 opacity-25"></i>
+                                <p class="mt-3 mb-0">No forensic claims initiated.</p>
+                                <small>Add a claim inside an account to start tracing.</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Recent Transaction Log -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 py-4 px-4">
+                <h6 class="fw-bold text-dark mb-0">Recent Activity Log</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for tx in recent_transactions %}
+                <div class="list-group-item border-light px-4 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-dark small">{{ tx.description|truncatechars:30 }}</div>
+                            <div class="small text-muted">{{ tx.transaction_date }} &bull; {{ tx.account.institution_name }}</div>
+                        </div>
+                        <span class="fw-bold font-monospace {% if tx.amount < 0 %}text-dark{% else %}text-success{% endif %}">
+                            {{ tx.amount|floatformat:2 }}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-5 px-4">
+                    <p class="text-muted small">No transactions found. Import a CSV to populate data.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

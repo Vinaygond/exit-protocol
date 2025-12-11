@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Initialize Case | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0 fw-bold brand-font"><i class="bi bi-folder-plus me-2"></i> Initialize New Case</h4>
+                        <p class="text-white-50 mb-0 small mt-1">Create a secure container for legal proceedings.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Section 1: Core Identifiers -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3">Case Identification</h6>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Case Number</label>
+                            {{ form.case_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Case Title</label>
+                            {{ form.case_title }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Current Status</label>
+                            {{ form.status }}
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Court Details -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3 border-top pt-4">Jurisdiction & Court</h6>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Court Name</label>
+                            {{ form.court_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Jurisdiction (County/State)</label>
+                            {{ form.court_jurisdiction }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold small text-muted">Presiding Judge</label>
+                            {{ form.judge_name }}
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Critical Dates -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3 border-top pt-4">Critical Timeline</h6>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Date of Marriage</label>
+                            {{ form.marriage_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Date of Separation</label>
+                            {{ form.separation_date }}
+                            <div class="form-text text-warning small"><i class="bi bi-exclamation-triangle"></i> Crucial for asset tracing</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Filing Date</label>
+                            {{ form.filing_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Est. Resolution</label>
+                            {{ form.expected_resolution_date }}
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Financial Estimates -->
+                    <h6 class="text-uppercase text-muted fw-bold small mb-3 border-top pt-4">Asset Estimates</h6>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Est. Marital Assets ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.estimated_marital_assets }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted">Est. Separate Assets ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.estimated_separate_assets }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end align-items-center mt-5 gap-3">
+                        <a href="{% url 'cases:case_list' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm">Initialize Case</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

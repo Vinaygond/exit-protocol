@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Upload Evidence | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-cloud-upload me-2"></i> Secure Upload</h4>
+                <p class="text-white-50 mb-0 small mt-1">Files are hashed and encrypted upon receipt.</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- File Drop Zone Style -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Select Document</label>
+                        {{ form.document }}
+                        <div class="form-text">Supported: PDF, JPG, PNG, DOCX, CSV. Max size: 50MB.</div>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Document Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Date on Doc</label>
+                            {{ form.document_date }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Classification</label>
+                            {{ form.document_type }}
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end pb-2">
+                            <div class="form-check form-switch">
+                                {{ form.is_privileged }}
+                                <label class="form-check-label fw-bold text-dark" for="id_is_privileged">
+                                    Mark as Attorney-Client Privileged
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Context / Description</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning d-flex align-items-center mt-4 border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                        <i class="bi bi-shield-check fs-4 me-3"></i>
+                        <div>
+                            <strong>Chain of Custody Warning</strong><br>
+                            <span class="small">Once uploaded, a cryptographic hash will be generated. The file cannot be silently modified later without breaking the chain.</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4">
+                        <a href="{% url 'evidence:evidence_list' %}" class="btn btn-light border px-4">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow-sm fw-bold">Secure Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Case Details | Exit Protocol{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="row mb-4 align-items-end">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'cases:case_list' %}">Cases</a></li>
+                <li class="breadcrumb-item active">{{ case.case_number }}</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold brand-font mb-0">{{ case.case_title }}</h2>
+        <span class="badge bg-secondary bg-opacity-10 text-secondary mt-2">
+            <i class="bi bi-building me-1"></i> {{ case.court_jurisdiction }}
+        </span>
+    </div>
+    <div class="col-md-4 text-end">
+        <div class="btn-group shadow-sm">
+            <a href="{% url 'cases:case_update' case.id %}" class="btn btn-light border">Edit Case</a>
+            <a href="{% url 'core:dashboard' %}" class="btn btn-primary">Open Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Case Overview & Timeline -->
+    <div class="col-lg-8">
+        <!-- Key Timeline Preview -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-uppercase text-muted small mb-0">Key Events</h6>
+                <a href="{% url 'cases:timeline_list' case.id %}" class="small text-decoration-none">View Full Timeline</a>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for event in timeline_events %}
+                <div class="list-group-item px-4 py-3 border-light">
+                    <div class="d-flex">
+                        <div class="me-3 text-center" style="min-width: 60px;">
+                            <span class="d-block fw-bold text-dark">{{ event.event_date|date:"M d" }}</span>
+                            <small class="text-muted">{{ event.event_date|date:"Y" }}</small>
+                        </div>
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark">{{ event.event_title }}</h6>
+                            <p class="mb-0 small text-muted text-truncate" style="max-width: 400px;">{{ event.event_description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="p-4 text-center text-muted small">
+                    No key events marked. 
+                    <a href="{% url 'cases:timeline_create' case.id %}" class="fw-bold">Add Event</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Notes -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-uppercase text-muted small mb-0">Recent Notes</h6>
+                <a href="{% url 'cases:note_create' case.id %}" class="btn btn-sm btn-light border">
+                    <i class="bi bi-plus-lg"></i> Add Note
+                </a>
+            </div>
+            <div class="card-body px-4 pt-0">
+                <div class="row g-3">
+                    {% for note in recent_notes %}
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded-3 h-100 border">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-white text-secondary border">{{ note.get_category_display }}</span>
+                                <small class="text-muted">{{ note.created_at|date:"M d" }}</small>
+                            </div>
+                            <h6 class="fw-bold">{{ note.title }}</h6>
+                            <p class="small text-muted mb-0 text-truncate">{{ note.content }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-3 text-muted">No notes yet.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Parties & Details -->
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card bg-dark text-white border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h6 class="opacity-75 text-uppercase small">Current Status</h6>
+                <h3 class="fw-bold mb-3">{{ case.get_status_display }}</h3>
+                <div class="progress bg-white bg-opacity-10" style="height: 6px;">
+                    <div class="progress-bar bg-warning" role="progressbar" style="width: 40%"></div>
+                </div>
+                <div class="mt-3 small opacity-75">
+                    Est. Assets: ${{ case.estimated_marital_assets|default:"0.00" }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Parties List -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-header bg-white border-0 py-3 px-4">
+                <h6 class="fw-bold text-uppercase text-muted small mb-0">Case Parties</h6>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for party in case_parties %}
+                <div class="list-group-item px-4 py-3 border-light">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-3">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold text-dark">{{ party.user.first_name }} {{ party.user.last_name }}</h6>
+                            <span class="badge bg-light text-dark border">{{ party.get_role_display }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

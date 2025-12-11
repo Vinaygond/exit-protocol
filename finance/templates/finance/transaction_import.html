@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Import Transactions | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-primary text-white p-4">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-file-earmark-spreadsheet me-2"></i> Bulk Import</h4>
+                <p class="text-white-50 mb-0 small mt-1">
+                    Importing into: <strong>{{ account.account_name }}</strong> ({{ account.institution_name }})
+                </p>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                
+                <!-- Format Instructions -->
+                <div class="alert alert-info border-0 bg-info bg-opacity-10 mb-4">
+                    <div class="d-flex">
+                        <i class="bi bi-info-circle-fill text-info fs-4 me-3"></i>
+                        <div>
+                            <h6 class="fw-bold text-info mb-1">CSV Format Requirements</h6>
+                            <p class="small mb-2 text-dark opacity-75">Your CSV file must include headers matching these columns:</p>
+                            <code class="bg-white px-2 py-1 rounded border small d-block mb-2">date, description, amount</code>
+                            <ul class="mb-0 small text-dark opacity-75 ps-3">
+                                <li><strong>Date:</strong> YYYY-MM-DD (e.g., 2024-01-25)</li>
+                                <li><strong>Amount:</strong> Positive for deposits, negative for withdrawals (e.g., -50.00)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Select CSV File</label>
+                        {{ form.csv_file }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
+                        <a href="{% url 'finance:account_detail' account.id %}" class="btn btn-light border px-4 fw-medium">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                            <i class="bi bi-cloud-upload me-2"></i> Process Import
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

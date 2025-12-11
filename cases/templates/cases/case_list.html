@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}My Cases | Exit Protocol{% endblock %}
+{% block page_title %}Case Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h3 class="fw-bold text-dark brand-font">Case Registry</h3>
+        <p class="text-muted small">Manage active legal proceedings and archives.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{% url 'cases:case_create' %}" class="btn btn-dark shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i> Initialize New Case
+        </a>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+                <tr>
+                    <th class="px-4 py-3 text-uppercase text-muted small fw-bold">Case Identity</th>
+                    <th class="py-3 text-uppercase text-muted small fw-bold">Status</th>
+                    <th class="py-3 text-uppercase text-muted small fw-bold">Jurisdiction</th>
+                    <th class="py-3 text-uppercase text-muted small fw-bold">Timeline</th>
+                    <th class="px-4 py-3 text-end text-uppercase text-muted small fw-bold">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for case in cases %}
+                <tr>
+                    <td class="px-4 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-2 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                <i class="bi bi-briefcase-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold text-dark">{{ case.case_title }}</h6>
+                                <span class="badge bg-light text-dark border">{{ case.case_number }}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if case.status == 'active' or case.status == 'initiated' %}
+                            <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Active</span>
+                        {% elif case.status == 'discovery' %}
+                            <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">Discovery</span>
+                        {% else %}
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3 py-2">{{ case.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <span class="fw-medium text-dark">{{ case.court_jurisdiction|default:"-" }}</span>
+                            <small class="text-muted">{{ case.court_name|default:"" }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <small class="text-muted">Filed: <span class="text-dark fw-medium">{{ case.filing_date|default:"-" }}</span></small>
+                            <small class="text-muted">Sep: <span class="text-dark fw-medium">{{ case.separation_date|default:"-" }}</span></small>
+                        </div>
+                    </td>
+                    <td class="px-4 text-end">
+                        <a href="{% url 'core:switch_case' case.id %}" class="btn btn-sm btn-primary me-1" title="Set Active">
+                            Switch Case
+                        </a>
+                        <a href="{% url 'cases:case_detail' case.id %}" class="btn btn-sm btn-light border" title="View Details">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="mb-3 text-muted opacity-25">
+                            <i class="bi bi-folder-x fs-1"></i>
+                        </div>
+                        <h6 class="fw-bold text-muted">No cases found</h6>
+                        <p class="small text-muted mb-3">You are not associated with any active legal proceedings.</p>
+                        <a href="{% url 'cases:case_create' %}" class="btn btn-sm btn-primary">Initialize First Case</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

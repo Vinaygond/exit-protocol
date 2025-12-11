@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Message | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <a href="{% url 'communication:message_list' %}" class="text-decoration-none text-muted small mb-2 d-inline-block">
+            <i class="bi bi-arrow-left me-1"></i> Back to Inbox
+        </a>
+        <h3 class="fw-bold text-dark">{{ message.subject }}</h3>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <!-- Thread History -->
+        {% for thread_msg in thread_messages %}
+            <div class="card border-0 shadow-sm rounded-4 mb-3 {% if thread_msg.sender == user %}bg-light ms-5{% else %}me-5{% endif %}">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                        <span class="fw-bold text-dark">{{ thread_msg.sender.get_full_name }}</span>
+                        <small class="text-muted">{{ thread_msg.sent_at|date:"M d, Y H:i" }}</small>
+                    </div>
+                    <div class="text-dark">{{ thread_msg.original_body|linebreaks }}</div>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Current Message (if not in thread list) -->
+        {% if not thread_messages %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-header bg-white px-4 py-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary text-white rounded-circle p-2 me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                        {{ message.sender.first_name|first }}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-dark">{{ message.sender.get_full_name }}</h6>
+                        <small class="text-muted">To: 
+                            {% for rec in message.recipients.all %}{{ rec.first_name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                        </small>
+                    </div>
+                </div>
+                <small class="text-muted">{{ message.sent_at|date:"M d, Y H:i" }}</small>
+            </div>
+            <div class="card-body p-4">
+                {{ message.original_body|linebreaks }}
+            </div>
+            <div class="card-footer bg-light px-4 py-3">
+                <a href="{% url 'communication:message_reply' message.id %}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-reply-fill me-2"></i> Reply
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

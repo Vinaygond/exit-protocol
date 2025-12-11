@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Forensic Analysis | Exit Protocol{% endblock %}
+
+{% block content %}
+<!-- Header & Actions -->
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'finance:account_detail' claim.account.id %}">{{ claim.account.account_name }}</a></li>
+                <li class="breadcrumb-item active">Claim #{{ claim.id|stringformat:".4s" }}</li>
+            </ol>
+        </nav>
+        <h3 class="fw-bold brand-font text-dark mb-0">
+            <i class="bi bi-shield-lock-fill text-warning me-2"></i>{{ claim.claim_name }}
+        </h3>
+        <p class="text-muted small mb-0 mt-1">
+            Source: {{ claim.get_source_type_display }} &bull; Deposited {{ claim.initial_deposit_date }}
+        </p>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+        <div class="btn-group shadow-sm">
+            <a href="{% url 'finance:claim_recalculate' claim.id %}" class="btn btn-light border text-dark">
+                <i class="bi bi-arrow-repeat me-1"></i> Recalculate LIBR
+            </a>
+            <a href="{% url 'finance:claim_export_pdf' claim.id %}" class="btn btn-dark shadow-sm">
+              <i class="bi bi-file-earmark-pdf-fill me-2"></i> Download Court PDF
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Status Alert -->
+{% if claim.calculation_status == 'calculating' %}
+<div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-dark d-flex align-items-center shadow-sm mb-4">
+    <div class="spinner-border spinner-border-sm me-3" role="status"></div>
+    <div>
+        <strong>Analysis in Progress:</strong> The LIBR algorithm is currently tracing funds through the transaction history.
+    </div>
+</div>
+{% endif %}
+
+<!-- Executive Summary Cards -->
+<div class="row g-4 mb-5">
+    <!-- Initial Input -->
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-light">
+            <div class="card-body p-4">
+                <small class="text-muted text-uppercase fw-bold ls-1">Initial Deposit</small>
+                <h2 class="fw-bold text-dark mb-0 mt-2">${{ claim.initial_amount|floatformat:0 }}</h2>
+                <div class="small text-muted mt-1">on {{ claim.initial_deposit_date }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Dip -->
+    <div class="col-md-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-danger bg-opacity-10">
+            <div class="card-body p-4 position-relative">
+                <div class="position-absolute top-0 end-0 p-3 text-danger opacity-50">
+                    <i class="bi bi-graph-down-arrow fs-3"></i>
+                </div>
+                <small class="text-danger text-uppercase fw-bold ls-1">Lowest Dip</small>
+                <h2 class="fw-bold text-danger mb-0 mt-2">${{ claim.lowest_balance_amount|floatformat:0 }}</h2>
+                <div class="small text-danger mt-1">
+                    {% if claim.lowest_balance_date %}
+                        on {{ claim.lowest_balance_date }}
+                    {% else %}
+                        No dip detected
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Forensic Result -->
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-dark text-white overflow-hidden">
+            <div class="card-body p-4">
+                <div class="row align-items-center h-100">
+                    <div class="col-8">
+                        <small class="text-warning text-uppercase fw-bold ls-1">
+                            <i class="bi bi-check-circle-fill me-1"></i>Legally Traceable
+                        </small>
+                        <h1 class="fw-bold text-white mb-0 mt-2 display-5">${{ claim.current_traceable_amount|floatformat:2 }}</h1>
+                        <p class="text-white-50 small mb-0 mt-2">
+                            {{ report.current_status.percentage_retained }}% of original separate property preserved.
+                        </p>
+                    </div>
+                    <div class="col-4 text-end">
+                        <!-- Retention Visual -->
+                        <div style="width: 100px; height: 100px; display: inline-block;">
+                            <canvas id="retentionDoughnut"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Evidence Chart -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+    <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold text-dark mb-0">Balance History & LIBR Thresholds</h5>
+        <span class="badge bg-light text-dark border">
+            <i class="bi bi-calendar3 me-1"></i> Since {{ claim.initial_deposit_date }}
+        </span>
+    </div>
+    <div class="card-body p-4">
+        <div style="height: 400px; width: 100%;">
+            <canvas id="librChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Narrative Analysis -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 bg-primary bg-opacity-10 h-100">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-primary text-uppercase small mb-3"><i class="bi bi-stars me-2"></i>Forensic Analysis</h6>
+                <p class="mb-0 text-dark lead" style="font-family: 'Georgia', serif; line-height: 1.6;">
+                    "{{ report.analysis }}"
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-header bg-white border-0 py-3 px-4">
+                <h6 class="fw-bold text-muted small text-uppercase mb-0">Claim Details</h6>
+            </div>
+            <div class="card-body px-4 pb-4 pt-0">
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status</span>
+                        <span class="fw-bold text-success text-uppercase">
+                            {{ claim.get_calculation_status_display }}
+                        </span>
+                    </li>
+                    <li class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Last Calculated</span>
+                        <span>{{ claim.last_calculated_at|date:"M d, H:i" }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Created By</span>
+                        <span>{{ claim.created_by.first_name }}</span>
+                    </li>
+                    <hr class="my-2 border-light">
+                    <li>
+                        <span class="text-muted d-block mb-1">Context</span>
+                        <p class="bg-light p-2 rounded text-dark mb-0">
+                            {{ claim.description|default:"No context provided." }}
+                        </p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Fetch Chart Data
+        fetch("{% url 'finance:balance_chart_data' claim.account.id %}")
+            .then(response => response.json())
+            .then(data => {
+                renderLibrChart(data);
+            });
+
+        // 2. Render Doughnut (Retention % in top right card)
+        const ctxDoughnut = document.getElementById('retentionDoughnut').getContext('2d');
+        new Chart(ctxDoughnut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Retained', 'Commingled'],
+                datasets: [{
+                    data: [{{ report.current_status.percentage_retained }}, 100 - {{ report.current_status.percentage_retained }}],
+                    backgroundColor: ['#10b981', '#ffffff'], // Emerald, White (on dark bg)
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: { 
+                cutout: '75%', 
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { enabled: false } 
+                } 
+            }
+        });
+    });
+
+    function renderLibrChart(data) {
+        const ctx = document.getElementById('librChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.dates,
+                datasets: [
+                    {
+                        label: 'Total Account Balance',
+                        data: data.total_balance,
+                        borderColor: '#94a3b8', // Slate 400
+                        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        order: 2
+                    },
+                    {
+                        label: 'Separate Property Limit',
+                        data: data.separate_balance,
+                        borderColor: '#f59e0b', // Amber 500
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: 0,
+                        order: 1
+                    },
+                    {
+                        // Dip Points (Red Dots)
+                        label: 'Critical Dip Event',
+                        data: data.dip_points.map(p => ({x: p.date, y: p.balance})),
+                        backgroundColor: '#ef4444', // Red 500
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        showLine: false, // Only show points
+                        type: 'scatter',
+                        order: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: { position: 'top', align: 'end' },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        titleFont: { size: 13 },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { borderDash: [2, 4], color: '#e2e8f0' },
+                        ticks: {
+                            callback: function(value) { return '$' + value.toLocaleString(); }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxTicksLimit: 12 }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

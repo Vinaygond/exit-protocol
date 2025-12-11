@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Register - Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2><i class="bi bi-person-plus text-primary"></i></h2>
+                    <h3>Create Account</h3>
+                    <p class="text-muted">Join Exit Protocol</p>
+                </div>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label">First Name</label>
+                            {% render_field form.first_name class="form-control" %}
+                            {% if form.first_name.errors %}
+                            <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label">Last Name</label>
+                            {% render_field form.last_name class="form-control" %}
+                            {% if form.last_name.errors %}
+                            <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email Address</label>
+                        {% render_field form.email class="form-control" placeholder="your@email.com" %}
+                        {% if form.email.errors %}
+                        <div class="text-danger small">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_phone_number" class="form-label">Phone Number (Optional)</label>
+                        {% render_field form.phone_number class="form-control" placeholder="+1234567890" %}
+                        {% if form.phone_number.errors %}
+                        <div class="text-danger small">{{ form.phone_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Password</label>
+                        {% render_field form.password class="form-control" %}
+                        <small class="form-text text-muted">
+                            Minimum 12 characters with letters, numbers, and symbols
+                        </small>
+                        {% if form.password.errors %}
+                        <div class="text-danger small">{{ form.password.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password_confirm" class="form-label">Confirm Password</label>
+                        {% render_field form.password_confirm class="form-control" %}
+                        {% if form.password_confirm.errors %}
+                        <div class="text-danger small">{{ form.password_confirm.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        {{ form.non_field_errors }}
+                    </div>
+                    {% endif %}
+                    
+                    <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                        <i class="bi bi-person-check"></i> Create Account
+                    </button>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{% url 'accounts:login' %}">Login here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

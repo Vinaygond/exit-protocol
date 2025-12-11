@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Select Active Case | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 text-center">
+            <div class="mb-4">
+                <i class="bi bi-shield-lock text-primary" style="font-size: 3rem;"></i>
+                <h2 class="fw-bold mt-3">Select Active Case</h2>
+                <p class="text-muted">Please select which legal matter you want to work on.</p>
+            </div>
+
+            <div class="list-group shadow-sm rounded-4 text-start">
+                {% for case in cases %}
+                <form method="post" action="{% url 'cases:select_case' %}" class="list-group-item list-group-item-action p-0 border-0">
+                    {% csrf_token %}
+                    <input type="hidden" name="case_id" value="{{ case.id }}">
+                    <button type="submit" class="btn btn-light w-100 text-start p-4 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h5 class="mb-1 fw-bold text-dark">{{ case.case_title }}</h5>
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ case.case_number }}</span>
+                            <span class="text-muted small ms-2">{{ case.court_jurisdiction }}</span>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </button>
+                </form>
+                {% endfor %}
+            </div>
+
+            <div class="mt-4">
+                <a href="{% url 'cases:case_create' %}" class="text-decoration-none fw-bold">
+                    <i class="bi bi-plus-circle me-1"></i> Initialize New Case
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

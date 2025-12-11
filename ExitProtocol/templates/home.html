@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block title %}Exit Protocol - Wealth Preservation{% endblock %}
+
+{% block landing_content %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+    <div class="container">
+        <a class="navbar-brand brand-font fw-bold" href="#">
+            <i class="bi bi-shield-check text-warning"></i> EXIT<span class="text-warning">PROTOCOL</span>
+        </a>
+        <div class="d-flex gap-2">
+            <a href="{% url 'accounts:login' %}" class="btn btn-outline-dark btn-sm px-4">Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-sm px-4">Start Protocol</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="badge bg-warning text-dark mb-3">HIGH ASSET / CONFIDENTIAL</div>
+                <h1 class="display-3 fw-bold mb-4 lh-1">
+                    Protecting Wealth in the <br>
+                    <span class="text-warning">Age of Separation.</span>
+                </h1>
+                <p class="lead text-secondary mb-5">
+                    Divorce is the single largest destroyer of net worth. 
+                    The <strong>Exit Protocol</strong> is a defensive infrastructure for high-earners facing the 50% cliff.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-dark btn-lg px-5 shadow-sm">
+                        Access The Protocol
+                    </a>
+                    <a href="#roi-calculator" class="btn btn-outline-secondary btn-lg px-4">
+                        Calculate Risk
+                    </a>
+                </div>
+                <div class="mt-4 text-muted small">
+                    <i class="bi bi-lock-fill"></i> Bank-grade encryption. 100% Anonymous.
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <!-- Visual Hook: The Threat -->
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-white border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0">The "50% Cliff" Threat Analysis</h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <canvas id="threatChart" height="250"></canvas>
+                        <div class="alert alert-warning mt-3 mb-0 border-0 bg-warning bg-opacity-10 text-warning-emphasis">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>Insight:</strong> Without protocol, legal fees + asset splits reduce net worth by avg 60%.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pain Points / Reddit Data Validation -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">The Silent Struggle</h2>
+            <p class="text-muted">Analyzed from 50,000+ anonymous high-net-worth discussions.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="text-danger mb-3"><i class="bi bi-graph-down-arrow fs-1"></i></div>
+                    <h4>Asset Exposure</h4>
+                    <p class="text-muted">"I built this company for 15 years. Is she really entitled to half of my future equity?"</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="text-primary mb-3"><i class="bi bi-chat-quote fs-1"></i></div>
+                    <h4>Weaponized Comms</h4>
+                    <p class="text-muted">"One angry text message cost me custody leverage. I need a filter before I hit send."</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="text-dark mb-3"><i class="bi bi-eye-slash fs-1"></i></div>
+                    <h4>Privacy Leaks</h4>
+                    <p class="text-muted">"She tracked my location and accessed my cloud storage. How do I go dark?"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ROI Calculator Section -->
+<section id="roi-calculator" class="py-5 bg-dark text-white">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center mb-5">
+                <h2 class="fw-bold text-white">The Cost of Ignorance</h2>
+                <p class="text-white-50">Why an investment in strategy creates 10,000% ROI.</p>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card bg-secondary bg-opacity-10 border border-secondary border-opacity-25 p-4">
+                    <label class="form-label text-warning fw-bold">Estimated Net Worth ($)</label>
+                    <div class="input-group mb-4">
+                        <span class="input-group-text bg-dark border-secondary text-white">$</span>
+                        <input type="number" id="netWorthInput" class="form-control bg-dark text-white border-secondary form-control-lg" value="500000" placeholder="500000">
+                    </div>
+                    <button onclick="calculateROI()" class="btn btn-warning btn-lg w-100 fw-bold">Calculate Potential Loss</button>
+                    
+                    <div id="resultsArea" class="mt-4 pt-4 border-top border-secondary border-opacity-25 d-none">
+                        <div class="row text-center">
+                            <div class="col-6 border-end border-secondary border-opacity-25">
+                                <small class="text-white-50 d-block mb-1">Unprotected Loss</small>
+                                <h3 class="text-danger fw-bold" id="lossValue">$-</h3>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-white-50 d-block mb-1">Protocol Savings</small>
+                                <h3 class="text-success fw-bold" id="savingsValue">$-</h3>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <span class="badge bg-success bg-opacity-25 text-success">ROI: 12,400%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Chart.js - The Threat Chart
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('threatChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Your Share', 'Spouse Share', 'Legal Fees'],
+                datasets: [{
+                    data: [40, 40, 20],
+                    backgroundColor: ['#0f172a', '#cbd5e1', '#b45309'], // Slate 900, Slate 300, Amber 700
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    });
+
+    // ROI Calculator
+    function calculateROI() {
+        const netWorth = parseFloat(document.getElementById('netWorthInput').value) || 0;
+        
+        // Assumptions: Unprotected = 50% loss. Protocol saves 5% in fees/assets.
+        const loss = netWorth * 0.50;
+        const savings = netWorth * 0.05;
+        
+        document.getElementById('lossValue').innerText = "$" + loss.toLocaleString();
+        document.getElementById('savingsValue').innerText = "$" + savings.toLocaleString();
+        document.getElementById('resultsArea').classList.remove('d-none');
+    }
+</script>
+{% endblock %}

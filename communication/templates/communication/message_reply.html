@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% block title %}Reply to Message{% endblock %}
+{% block page_title %}Reply to Message{% endblock %}
+{% block content %}
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-md-10">
+<div class="card mb-3">
+<div class="card-header">
+<h6 class="mb-0">Original Message</h6>
+</div>
+<div class="card-body">
+<p><strong>{{ original_message.subject }}</strong></p>
+<p class="text-muted">{{ original_message.original_body|truncatewords:50 }}</p>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h5 class="mb-0">Your Reply</h5>
+</div>
+<div class="card-body">
+
+<form method="post">
+{% csrf_token %}
+<div class="mb-3">
+<label class="form-label">Message</label>
+{% render_field form.original_body class="form-control" %}
+</div>
+<div class="mb-3">
+<div class="form-check">
+{% render_field form.apply_biff_filter class="form-check-input" %}
+<label class="form-check-label">Apply BIFF Filter</label>
+</div>
+</div>
+<div class="d-flex justify-content-between">
+<a href="{% url 'communication:message_detail' original_message.id %}"
+
+class="btn btn-secondary">Cancel</a>
+
+<button type="submit" class="btn btn-primary">
+<i class="bi bi-send"></i> Send Reply
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

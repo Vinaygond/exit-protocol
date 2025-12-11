@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Accounts - Exit Protocol{% endblock %}
+{% block page_title %}Financial Accounts{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h3>Financial Accounts</h3>
+            <p class="text-muted">Manage and track financial accounts for {{ case.case_title }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'finance:account_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Account
+            </a>
+            <a href="{% url 'finance:financial_summary' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-graph-up"></i> Summary
+            </a>
+        </div>
+    </div>
+    
+    <!-- Total Balance Card -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Balance Across All Accounts</h5>
+                    <h2 class="mb-0">${{ total_balance|floatformat:2 }}</h2>
+                    <small>{{ accounts|length }} active account{{ accounts|length|pluralize }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Accounts List -->
+    {% if accounts %}
+    <div class="row">
+        {% for account in accounts %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">{{ account.account_name }}</h5>
+                            <p class="text-muted mb-0">
+                                <small>{{ account.institution_name }}</small>
+                            </p>
+                        </div>
+                        <span class="badge bg-secondary">{{ account.get_account_type_display }}</span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h3 class="mb-0 {% if account.current_balance >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            ${{ account.current_balance|floatformat:2 }}
+                        </h3>
+                        <small class="text-muted">Current Balance</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge {% if account.ownership == 'joint' %}bg-info{% elif account.ownership == 'petitioner' %}bg-primary{% else %}bg-secondary{% endif %}">
+                            {{ account.get_ownership_display }}
+                        </span>
+                    </div>
+                    
+                    <div class="row text-center border-top pt-3">
+                        <div class="col-6">
+                            <p class="mb-0 text-muted small">Transactions</p>
+                            <strong>{{ account.transaction_count }}</strong>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 text-muted small">Claims</p>
+                            <strong>{{ account.separate_property_claims.count }}</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <a href="{% url 'finance:account_detail' account.id %}" class="btn btn-sm btn-outline-primary w-100">
+                        <i class="bi bi-eye"></i> View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-bank" style="font-size: 4rem; color: #ccc;"></i>
+            <h4 class="mt-3">No Financial Accounts Yet</h4>
+            <p class="text-muted">Start by adding your first financial account</p>
+            <a href="{% url 'finance:account_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Add Your First Account
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

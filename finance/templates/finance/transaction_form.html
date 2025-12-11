@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Log Transaction | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-dark text-white p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="mb-0 fw-bold brand-font"><i class="bi bi-pencil-square me-2"></i> Log Transaction</h4>
+                    <p class="text-white-50 mb-0 small mt-1">
+                        Recording entry for <span class="text-white fw-bold">{{ account.account_name }}</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger shadow-sm mb-4">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Please correct the errors below.
+                        </div>
+                    {% endif %}
+
+                    <!-- Core Details -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Date</label>
+                            {{ form.transaction_date }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Description / Payee</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <!-- Financials -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Transaction Type</label>
+                            {{ form.transaction_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold">$</span>
+                                {{ form.amount }}
+                            </div>
+                            <div class="form-text small">Enter positive numbers for both deposits and withdrawals.</div>
+                        </div>
+                    </div>
+
+                    <!-- Categorization -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Category</label>
+                        {{ form.category }}
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Memo / Notes</label>
+                        {{ form.memo }}
+                        <div class="form-text">Add context for forensic analysis (e.g., "Check #104").</div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
+                        <a href="{% url 'finance:account_detail' account.id %}" class="btn btn-light border px-4 fw-medium">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
+                            <i class="bi bi-save me-2"></i> Save Entry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

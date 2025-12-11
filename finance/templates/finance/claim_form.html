@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}New Forensic Claim | Exit Protocol{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden border-top border-warning border-5">
+            <div class="card-header bg-white p-4">
+                <div class="d-flex align-items-center mb-2">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle p-2 me-3">
+                        <i class="bi bi-shield-lock-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold brand-font text-dark">Initiate Separate Property Claim</h4>
+                        <span class="badge bg-light text-muted border mt-1">LIBR Forensic Analysis</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-4 p-md-5">
+                <p class="text-muted small mb-4">
+                    This tool uses the <strong>Lowest Intermediate Balance Rule (LIBR)</strong> to mathematically prove which portion of this commingled account remains your separate property.
+                </p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <h6 class="text-uppercase text-warning fw-bold small mb-3 letter-spacing-1">Claim Origin</h6>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-muted">Claim Title</label>
+                            {{ form.claim_name }}
+                            <div class="form-text">e.g., "Grandmother's Inheritance"</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Source Type</label>
+                            {{ form.source_type }}
+                        </div>
+                    </div>
+
+                    <h6 class="text-uppercase text-warning fw-bold small mb-3 border-top pt-4 letter-spacing-1">Initial Deposit</h6>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Deposit Date</label>
+                            {{ form.initial_deposit_date }}
+                            <div class="form-text text-warning small"><i class="bi bi-exclamation-circle"></i> Tracing begins on this date.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Initial Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light fw-bold">$</span>
+                                {{ form.initial_amount }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Description / Context</label>
+                        {{ form.description }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-5 pt-3 border-top">
+                        <a href="{% url 'finance:account_detail' account.id %}" class="btn btn-light border px-4 fw-medium">Cancel</a>
+                        <button type="submit" class="btn btn-warning px-5 fw-bold shadow-sm text-dark">
+                            <i class="bi bi-calculator me-2"></i> Start Tracing
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

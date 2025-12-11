@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}Exit Protocol{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts for High-End Feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0f172a; /* Slate 900 - Authority */
+            --secondary-color: #b45309; /* Amber 700 - Wealth/Warning */
+            --sidebar-width: 260px;
+            --bg-light: #f8fafc;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: #334155;
+        }
+
+        h1, h2, h3, h4, .brand-font {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            padding-top: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar .nav-link {
+            color: #94a3b8;
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid var(--secondary-color);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            width: 20px;
+        }
+        
+        /* Main Content Wrapper */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: 100vh;
+            background-color: #f1f5f9;
+        }
+        
+        /* Navbar Top (App Mode) */
+        .navbar-top {
+            background-color: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-left: var(--sidebar-width);
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 0 20px;
+            letter-spacing: -0.5px;
+        }
+
+        .case-selector {
+            background-color: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 15px;
+            margin: 0 12px 25px 12px;
+            border-radius: 8px;
+            color: white;
+        }
+
+        /* Card Styling */
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 12px;
+            background: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1e293b;
+            border-color: #1e293b;
+        }
+
+        .text-accent {
+            color: var(--secondary-color);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <!-- Sidebar (App Mode) -->
+    <div class="sidebar">
+        <div class="logo brand-font">
+            <i class="bi bi-shield-check text-accent"></i> EXIT<span class="text-accent">PROTOCOL</span>
+        </div>
+        
+        <div class="case-selector">
+            <small class="d-block text-uppercase text-xs text-muted" style="font-size: 0.7rem;">Active Case</small>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold">2025-CV-01</span>
+                <i class="bi bi-chevron-down" style="font-size: 0.8rem;"></i>
+            </div>
+            <small class="text-white-50">John Doe Asset Protection</small>
+        </div>
+        
+        <nav class="nav flex-column">
+            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+               href="{% url 'core:dashboard' %}">
+                <i class="bi bi-grid-1x2"></i> Dashboard
+            </a>
+            
+            <a class="nav-link" href="#">
+                <i class="bi bi-briefcase"></i> Cases
+            </a>
+            
+            <a class="nav-link" href="#">
+                <i class="bi bi-bank"></i> Financial Accounts
+            </a>
+
+            <a class="nav-link" href="#">
+                <i class="bi bi-file-earmark-lock"></i> Evidence Locker
+            </a>
+            
+            <a class="nav-link" href="#">
+                <i class="bi bi-chat-left-text"></i> Secure Comms
+                <span class="badge bg-danger ms-auto rounded-pill" style="font-size: 0.7rem;">2</span>
+            </a>
+            
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 20px 12px;">
+            
+            <a class="nav-link" href="{% url 'accounts:profile' %}">
+                <i class="bi bi-gear"></i> Settings
+            </a>
+            
+            <a class="nav-link text-danger" href="{% url 'accounts:logout' %}">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </nav>
+    </div>
+    
+    <!-- Navbar Top (App Mode) -->
+    <div class="navbar-top">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">{% block page_title %}Dashboard{% endblock %}</h5>
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-light btn-sm rounded-circle position-relative">
+                    <i class="bi bi-bell"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
+                        <span class="visually-hidden">New alerts</span>
+                    </span>
+                </button>
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-dark dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                            {{ user.first_name|first|default:"U" }}
+                        </div>
+                        <span class="d-none d-sm-inline">{{ user.first_name|default:"User" }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="dropdownUser1">
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Main Content Wrapper Logic -->
+    {% if user.is_authenticated %}
+        <div class="main-content">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+    {% else %}
+        <!-- Landing Page Wrapper (Full Width) -->
+        <div class="w-100">
+            {% block landing_content %}{% endblock %}
+        </div>
+    {% endif %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

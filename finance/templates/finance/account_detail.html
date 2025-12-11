@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ account.account_name }} | Exit Protocol{% endblock %}
+
+{% block content %}
+<!-- Header & Actions -->
+<div class="row mb-4 align-items-center">
+    <div class="col-md-7">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a href="{% url 'finance:account_list' %}">Accounts</a></li>
+                <li class="breadcrumb-item active">{{ account.institution_name }}</li>
+            </ol>
+        </nav>
+        <h2 class="fw-bold brand-font text-dark mb-0">
+            {{ account.account_name }} 
+            <span class="text-muted fs-5 fw-normal ms-2">{{ account.account_number|default:"****" }}</span>
+        </h2>
+    </div>
+    <div class="col-md-5 text-md-end mt-3 mt-md-0">
+        <div class="btn-group shadow-sm">
+            <a href="{% url 'finance:transaction_create' account.id %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> Add Transaction
+            </a>
+            <a href="{% url 'finance:transaction_import' account.id %}" class="btn btn-light border text-dark">
+                <i class="bi bi-upload me-1"></i> Import CSV
+            </a>
+            <a href="{% url 'finance:claim_create' account.id %}" class="btn btn-warning text-dark border-warning">
+                <i class="bi bi-shield-lock-fill me-1"></i> Add Forensic Claim
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Balance Summary Cards -->
+<div class="row g-4 mb-5">
+    <!-- Current Balance -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100 bg-dark text-white">
+            <div class="card-body p-4">
+                <small class="text-white-50 text-uppercase fw-bold ls-1">Current Balance</small>
+                <h1 class="fw-bold mb-0 mt-2">${{ account.current_balance|floatformat:2 }}</h1>
+                <div class="mt-3 small text-white-50">
+                    <span class="badge bg-light text-dark me-1">{{ account.get_account_type_display }}</span>
+                    {{ account.get_ownership_display }} Ownership
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body p-4">
+                <div class="row h-100 align-items-center">
+                    <div class="col-md-6 border-end">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="bg-success bg-opacity-10 text-success rounded-circle p-2 me-3">
+                                <i class="bi bi-arrow-down-left"></i>
+                            </div>
+                            <span class="text-muted small text-uppercase fw-bold">Total Deposits</span>
+                        </div>
+                        <h4 class="fw-bold text-success mb-0">${{ stats.total_deposits|floatformat:2 }}</h4>
+                    </div>
+                    <div class="col-md-6 ps-md-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="bg-danger bg-opacity-10 text-danger rounded-circle p-2 me-3">
+                                <i class="bi bi-arrow-up-right"></i>
+                            </div>
+                            <span class="text-muted small text-uppercase fw-bold">Total Withdrawals</span>
+                        </div>
+                        <h4 class="fw-bold text-danger mb-0">-${{ stats.total_withdrawals|floatformat:2 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Main Ledger -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+            <div class="card-header bg-white border-0 py-3 px-4 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-dark mb-0 text-uppercase small">Transaction Ledger</h6>
+                <span class="badge bg-light text-dark border">{{ stats.total_transactions }} Records</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="px-4 py-3 text-muted small text-uppercase">Date</th>
+                            <th class="py-3 text-muted small text-uppercase">Description</th>
+                            <th class="py-3 text-muted small text-uppercase">Category</th>
+                            <th class="px-4 py-3 text-end text-muted small text-uppercase">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                        <tr>
+                            <td class="px-4 text-nowrap">
+                                <span class="fw-medium text-dark">{{ tx.transaction_date|date:"M d, Y" }}</span>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark">{{ tx.description|truncatechars:40 }}</div>
+                                {% if tx.memo %}
+                                    <small class="text-muted fst-italic">{{ tx.memo|truncatechars:50 }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border">{{ tx.get_category_display }}</span>
+                            </td>
+                            <td class="px-4 text-end">
+                                {% if tx.amount > 0 %}
+                                    <span class="fw-bold text-success">+${{ tx.amount|floatformat:2 }}</span>
+                                {% else %}
+                                    <span class="fw-bold text-dark">${{ tx.amount|floatformat:2 }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="text-muted opacity-25 mb-3">
+                                    <i class="bi bi-receipt fs-1"></i>
+                                </div>
+                                <h6 class="text-muted fw-bold">Ledger Empty</h6>
+                                <p class="small text-muted mb-0">Import a statement or add transactions manually.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Forensic Claims (LIBR) -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-warning bg-opacity-10">
+            <div class="card-header bg-transparent border-0 py-3 px-4">
+                <h6 class="fw-bold text-dark mb-0 text-uppercase small">
+                    <i class="bi bi-search me-2"></i>Separate Property Claims
+                </h6>
+            </div>
+            <div class="card-body px-4 pb-4 pt-0">
+                <p class="small text-dark opacity-75 mb-3">
+                    Tracking separate funds mixed into this account using the Lowest Intermediate Balance Rule (LIBR).
+                </p>
+                
+                {% if claims %}
+                    <div class="list-group shadow-sm rounded-3">
+                        {% for claim in claims %}
+                        <a href="{% url 'finance:claim_detail' claim.id %}" class="list-group-item list-group-item-action p-3 border-0 mb-1 rounded-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold text-dark small">{{ claim.claim_name }}</span>
+                                {% if claim.calculation_status == 'calculating' %}
+                                    <span class="spinner-border spinner-border-sm text-warning"></span>
+                                {% else %}
+                                    <i class="bi bi-chevron-right text-muted small"></i>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex justify-content-between align-items-end">
+                                <div>
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">ORIGINAL</small>
+                                    <span class="fw-medium">${{ claim.initial_amount|floatformat:0 }}</span>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block" style="font-size: 0.7rem;">TRACEABLE</small>
+                                    <span class="fw-bold text-success">${{ claim.current_traceable_amount|floatformat:0 }}</span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4 bg-white rounded-3 border border-warning border-opacity-25">
+                        <small class="text-muted">No forensic tracing active.</small><br>
+                        <a href="{% url 'finance:claim_create' account.id %}" class="btn btn-sm btn-outline-dark mt-2">Start Tracing</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Meta Info -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <h6 class="fw-bold text-muted small text-uppercase mb-3">Account Metadata</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Date Opened</span>
+                        <span class="fw-medium">{{ account.opening_date|default:"Unknown" }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Last Reconciled</span>
+                        <span class="fw-medium">{{ account.last_reconciled_date|default:"Never" }}</span>
+                    </li>
+                    <li class="d-flex justify-content-between">
+                        <span class="text-muted">Linked Statement</span>
+                        <span class="fw-medium text-truncate" style="max-width: 150px;">
+                            {% if account.external_id %}
+                                <i class="bi bi-link-45deg"></i> Plaid Linked
+                            {% else %}
+                                Manual / CSV
+                            {% endif %}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

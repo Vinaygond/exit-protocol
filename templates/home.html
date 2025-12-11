@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+
+{% block title %}Exit Protocol | Forensic Asset Tracing{% endblock %}
+
+{% block landing_content %}
+<style>
+    /* Severe, Professional Theme */
+    :root {
+        --legal-black: #111111;
+        --legal-gray: #f4f4f4;
+        --legal-border: #dcdcdc;
+        --forensic-red: #8b0000; 
+        --forensic-gold: #c5a059;
+    }
+    
+    body {
+        background-color: #ffffff;
+        color: var(--legal-black);
+        font-family: 'Inter', sans-serif; /* Clean body text */
+    }
+
+    .serif-font {
+        font-family: 'Playfair Display', serif; /* Authority font */
+    }
+
+    .nav-link { color: #333; font-size: 0.9rem; font-weight: 500; }
+    .nav-link:hover { color: var(--forensic-gold); }
+
+    .hero-section {
+        border-bottom: 1px solid var(--legal-border);
+        padding: 6rem 0;
+    }
+
+    .stat-card {
+        border: 1px solid var(--legal-border);
+        background: #fff;
+        padding: 2rem;
+        transition: all 0.2s ease;
+    }
+    .stat-card:hover {
+        border-color: var(--forensic-gold);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .btn-firm {
+        background-color: var(--legal-black);
+        color: white;
+        border-radius: 2px; /* Square corners feel more serious */
+        padding: 12px 30px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        font-weight: 600;
+        border: 1px solid var(--legal-black);
+    }
+    .btn-firm:hover {
+        background-color: white;
+        color: var(--legal-black);
+    }
+
+    .btn-outline-firm {
+        border: 1px solid var(--legal-border);
+        color: #333;
+        border-radius: 2px;
+        padding: 12px 30px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+    .btn-outline-firm:hover {
+        border-color: var(--legal-black);
+        background: #f9f9f9;
+    }
+
+    .feature-list li {
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: start;
+        font-size: 0.95rem;
+        color: #444;
+    }
+    .feature-list i {
+        color: var(--forensic-gold);
+        margin-right: 1rem;
+        margin-top: 3px;
+    }
+
+    .warning-box {
+        background-color: #fffaf0;
+        border-left: 4px solid var(--forensic-gold);
+        padding: 1.5rem;
+    }
+</style>
+
+<!-- Minimal Navigation -->
+<nav class="navbar navbar-expand-lg bg-white sticky-top border-bottom">
+    <div class="container">
+        <a class="navbar-brand serif-font fw-bold" href="#" style="font-size: 1.5rem; letter-spacing: -0.5px;">
+            EXIT<span style="color: var(--forensic-gold);">PROTOCOL</span>
+        </a>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{% url 'accounts:login' %}" class="text-decoration-none text-dark small text-uppercase fw-bold ls-1">Client Login</a>
+            <a href="{% url 'accounts:register' %}" class="btn-firm">Secure Access</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero: The Problem Statement -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 pe-lg-5">
+                <div class="d-inline-block border border-secondary px-2 py-1 mb-4 text-uppercase small" style="font-size: 0.7rem; letter-spacing: 1px;">
+                    Forensic Asset Tracing
+                </div>
+                <h1 class="display-4 serif-font fw-bold mb-4 lh-sm">
+                    Preserve separate property in high-stakes litigation.
+                </h1>
+                <p class="lead text-muted mb-5" style="line-height: 1.8; font-size: 1.1rem;">
+                    The burden of proof is on you. Without a forensic audit, commingled assets are presumed marital.
+                    <br><br>
+                    <strong>Exit Protocol</strong> automates the Lowest Intermediate Balance Rule (LIBR) calculation, establishing a defensible, court-ready chain of custody for your net worth.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'accounts:register' %}" class="btn-firm">
+                        Initiate Forensic Audit
+                    </a>
+                    <a href="#methodology" class="btn-outline-firm">
+                        View Methodology
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <div class="card rounded-0 shadow-none border bg-light p-4">
+                    <h6 class="text-uppercase small fw-bold mb-3 border-bottom pb-2">Exhibit A: LIBR Analysis Output</h6>
+                    <!-- Clean Forensic Chart Visual -->
+                    <canvas id="heroChart" height="250"></canvas>
+                    <div class="mt-3 d-flex justify-content-between align-items-end">
+                        <div>
+                            <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Initial Separate Claim</small>
+                            <div class="fw-bold fs-5">$100,000.00</div>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-danger text-uppercase fw-bold" style="font-size: 0.65rem;">Traceable Remainder</small>
+                            <div class="fw-bold fs-4 text-danger">$42,150.00</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- The Methodology (Why it works) -->
+<section id="methodology" class="py-5">
+    <div class="container py-5">
+        <div class="row mb-5">
+            <div class="col-lg-8">
+                <h2 class="serif-font fw-bold mb-3">The Protocol</h2>
+                <p class="text-muted">An automated system of record designed to withstand legal scrutiny.</p>
+            </div>
+        </div>
+        
+        <div class="row g-0">
+            <div class="col-md-4 border-end border-bottom p-5 stat-card">
+                <i class="bi bi-file-earmark-lock fs-3 mb-3 text-secondary"></i>
+                <h5 class="fw-bold mb-3">1. Evidence Ingestion</h5>
+                <p class="text-muted small mb-0">
+                    Upload native PDF bank statements. Our parser extracts transaction data while establishing a cryptographic SHA-256 hash for chain-of-custody verification.
+                </p>
+            </div>
+            <div class="col-md-4 border-end border-bottom p-5 stat-card">
+                <i class="bi bi-calculator fs-3 mb-3 text-secondary"></i>
+                <h5 class="fw-bold mb-3">2. LIBR Execution</h5>
+                <p class="text-muted small mb-0">
+                    The system replays account history chronologically. It identifies every instance where the balance dipped below the separate property threshold, permanently adjusting the traceable claim.
+                </p>
+            </div>
+            <div class="col-md-4 border-bottom p-5 stat-card">
+                <i class="bi bi-file-pdf fs-3 mb-3 text-secondary"></i>
+                <h5 class="fw-bold mb-3">3. Defensible Output</h5>
+                <p class="text-muted small mb-0">
+                    Generate a court-admissible PDF report containing the Executive Summary, Dip Analysis, and full Transaction Ledger. Ready for counsel review.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- The Warning (Agitation) -->
+<section class="py-5 bg-light border-top border-bottom">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="warning-box">
+                    <div class="row">
+                        <div class="col-md-1 text-center">
+                            <i class="bi bi-exclamation-triangle fs-2" style="color: var(--forensic-gold);"></i>
+                        </div>
+                        <div class="col-md-11">
+                            <h5 class="fw-bold mb-2">The Cost of Inaction</h5>
+                            <p class="mb-0 text-muted">
+                                In equitable distribution states, commingling is the primary vector for asset loss. 
+                                Without a forensic tracing report, the court default is a 50/50 division of all funds. 
+                                A forensic accountant typically requires a $5,000 retainer and 4-6 weeks to produce the same analysis Exit Protocol performs in minutes.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="py-5">
+    <div class="container py-5 text-center">
+        <h2 class="serif-font fw-bold mb-4">Secure your position.</h2>
+        <p class="text-muted mb-5">
+            Create an encrypted case file. Upload evidence. Verify your claim.
+        </p>
+        <a href="{% url 'accounts:register' %}" class="btn-firm">
+            Initialize Case File
+        </a>
+        <div class="mt-4 text-muted small" style="font-size: 0.7rem;">
+            ENCRYPTED • PRIVATE • LOCAL
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-white py-5 border-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <span class="brand-font fw-bold fs-5">EXIT<span style="color: var(--forensic-gold);">PROTOCOL</span></span>
+                <p class="small text-muted mt-3 mb-0">
+                    &copy; 2025 Exit Protocol. All rights reserved.
+                </p>
+                <p class="small text-muted" style="font-size: 0.65rem;">
+                    Disclaimer: Exit Protocol is a data analysis tool, not a law firm. The outputs generated are for informational purposes 
+                    and should be reviewed by qualified legal counsel before submission to any court.
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Minimalist, Serious Chart
+    const ctx = document.getElementById('heroChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [
+                {
+                    label: 'Total Balance',
+                    data: [100000, 90000, 42150, 150000, 140000, 160000],
+                    borderColor: '#333',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0, // Sharp lines imply precision
+                    fill: false
+                },
+                {
+                    label: 'Traceable Limit',
+                    data: [100000, 90000, 42150, 42150, 42150, 42150],
+                    borderColor: '#c5a059', // Gold
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    tension: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: { 
+                x: { display: false }, 
+                y: { 
+                    display: true,
+                    position: 'right',
+                    grid: { color: '#f0f0f0' },
+                    ticks: {
+                        font: { size: 9, family: 'Inter' },
+                        color: '#999',
+                        callback: function(value) { return '$' + value/1000 + 'k'; }
+                    }
+                } 
+            }
+        }
+    });
+</script>
+{% endblock %}
