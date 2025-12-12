@@ -7,13 +7,17 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# Use a default for dev, but override with env var in production
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-h9v@$fq$4#-@$767z5a!46oz9=k0yfxb$f@v1+-xylrt=(ndl#')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed Hosts: Mandatory for production
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com,exitprotocols.com,www.exitprotocols.com', cast=Csv())
+# Includes local IPs, Render domains, and your custom domain
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', 
+                       default='localhost,127.0.0.1,.onrender.com,exitprotocols.com,www.exitprotocols.com', 
+                       cast=Csv())
 
 # Application definition
 INSTALLED_APPS = [
@@ -54,7 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
-    # Custom Middleware
+    # Custom Middleware for Case Management
     'core.middleware.CaseContextMiddleware',
 ]
 
@@ -78,7 +82,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ExitProtocol.wsgi.application'
 
 # Database Configuration
-# Automatically switches between SQLite (Local) and PostgreSQL (Production)
+# Automatically switches between SQLite (Local) and PostgreSQL (Production) via dj_database_url
 DATABASES = {
     'default': dj_database_url.config(
         default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
@@ -96,6 +100,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Password Hashing - Use Argon2 for maximum security
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -107,9 +119,6 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles' # Where WhiteNoise collects files
 STATICFILES_DIRS = [BASE_DIR / 'static'] # Your local static folder
 
-# Enable WhiteNoise compression and caching
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Media Files (User Uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -117,7 +126,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Crispy Forms
+# Crispy Forms Settings
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
@@ -129,12 +138,23 @@ CELERY_RESULT_BACKEND = 'db+sqlite:///results.sqlite'
 
 # Production Security Settings (HTTPS)
 if not DEBUG:
+    # 1. Trust the Proxy (Render handles SSL)
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    
+    # 2. Trust your Domain for Form Submissions (CRITICAL for Login)
+    CSRF_TRUSTED_ORIGINS = [
+        'https://exitprotocols.com',
+        'https://www.exitprotocols.com',
+        'https://exit-protocol-app.onrender.com',
+    ]
+    
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    # HSTS settings (uncomment once HTTPS is confirmed working)
-    # SECURE_HSTS_SECONDS = 31536000
-    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    # SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'DENY'
+    
+    # Use compressed storage only in production
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
