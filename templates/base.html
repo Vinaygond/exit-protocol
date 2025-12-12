@@ -1,115 +1,100 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Exit Protocol{% endblock %}</title>
     
-    <!-- Bootstrap 5 -->
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- Google Fonts -->
+    
+    <!-- Fonts: Inter (UI) & Playfair Display (Headers) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            /* Light Theme (Default) */
+            --navy-dark: #0f172a;
+            --navy-light: #1e293b;
+            --gold-accent: #b45309;
             --bg-body: #f8fafc;
-            --bg-card: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #e2e8f0;
-            --accent-primary: #0f172a;
-            --accent-warning: #b45309;
-            --sidebar-bg: #0f172a;
             --sidebar-width: 260px;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-body);
-            color: var(--text-main);
+            color: #334155;
             min-height: 100vh;
         }
 
         .brand-font { font-family: 'Playfair Display', serif; }
 
-        /* Sidebar Structure */
+        /* --- LOGGED IN STYLES --- */
         .sidebar {
             position: fixed; top: 0; left: 0; height: 100vh; width: var(--sidebar-width);
-            background-color: var(--sidebar-bg);
+            background-color: var(--navy-dark);
             border-right: 1px solid rgba(255,255,255,0.05);
             z-index: 1000;
             padding-top: 20px;
-            overflow-y: auto;
         }
         
         .sidebar .nav-link {
             color: #94a3b8; margin: 4px 12px; padding: 12px 20px; border-radius: 6px;
-            transition: all 0.2s; font-weight: 500; text-decoration: none; display: flex; align-items: center;
+            transition: all 0.2s; font-weight: 500;
         }
         .sidebar .nav-link:hover, .sidebar .nav-link.active {
             background-color: rgba(255,255,255,0.1); color: white;
         }
-        .sidebar .nav-link i { margin-right: 12px; font-size: 1.1rem; }
+        .sidebar i { margin-right: 12px; }
 
-        /* Main Content Wrapper (App Mode) */
-        .main-content { 
-            margin-left: var(--sidebar-width); 
-            padding: 30px; 
-            min-height: 100vh; 
-            background-color: var(--bg-body);
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            min-height: 100vh;
         }
-        
-        /* Navbar Top (App Mode) */
-        .navbar-top {
-            background-color: var(--bg-card);
-            border-bottom: 1px solid var(--border-color);
-            margin-left: var(--sidebar-width); 
+
+        .navbar-app {
+            background-color: white;
+            border-bottom: 1px solid #e2e8f0;
+            margin-left: var(--sidebar-width);
             padding: 15px 30px;
             position: sticky; top: 0; z-index: 999;
         }
 
-        /* Full Width Wrapper (Landing/Auth Mode) */
+        /* --- LOGGED OUT STYLES --- */
         .landing-wrapper {
             width: 100%;
             min-height: 100vh;
-            background-color: #ffffff;
+            background-color: white;
         }
-
-        /* Utilities */
-        .cursor-pointer { cursor: pointer; }
-        .hover-elevate:hover { transform: translateY(-2px); transition: transform 0.2s; }
         
-        /* Stealth Mode Blur */
-        .sensitive-data { transition: filter 0.3s; }
-        body.stealth-mode .sensitive-data { filter: blur(6px); }
-        body.stealth-mode .sensitive-data:hover { filter: blur(0); }
+        /* Utils */
+        .btn-gold {
+            background-color: var(--gold-accent); color: white; border: none; font-weight: 600;
+        }
+        .btn-gold:hover { background-color: #92400e; color: white; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+
     {% if user.is_authenticated %}
-        <!-- APP LAYOUT (Sidebar + Topbar + Content) -->
-        
-        <!-- Sidebar -->
+        <!-- ================= APP LAYOUT ================= -->
         <div class="sidebar">
             <div class="px-4 mb-4">
-                <span class="brand-font fw-bold fs-4 text-white">EXIT<span style="color: var(--accent-warning);">PROTOCOL</span></span>
+                <span class="brand-font fw-bold fs-4 text-white">EXIT<span style="color: var(--gold-accent);">PROTOCOL</span></span>
             </div>
             
-            <!-- Case Selector -->
+            <!-- Case Info -->
             <div class="mx-3 mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
-                <small class="d-block text-uppercase text-muted" style="font-size: 0.65rem; letter-spacing: 1px;">Active Operation</small>
+                <small class="d-block text-uppercase text-muted" style="font-size: 0.65rem;">Active Case</small>
                 {% if request.case %}
-                    <div class="d-flex justify-content-between align-items-center mt-1 cursor-pointer" onclick="window.location.href='{% url 'cases:select_case' %}'">
-                        <span class="text-white fw-bold text-truncate">{{ request.case.case_number }}</span>
-                        <i class="bi bi-chevron-expand text-muted"></i>
+                    <div class="text-white fw-bold text-truncate cursor-pointer" onclick="window.location.href='{% url 'cases:select_case' %}'">
+                        {{ request.case.case_number }} <i class="bi bi-chevron-down ms-1" style="font-size: 0.7rem;"></i>
                     </div>
                 {% else %}
-                    <a href="{% url 'cases:case_create' %}" class="text-warning text-decoration-none fw-bold small d-block mt-1">
-                        <i class="bi bi-plus-circle me-1"></i> Initialize Case
-                    </a>
+                    <a href="{% url 'cases:case_create' %}" class="text-warning text-decoration-none fw-bold small">+ Initialize Case</a>
                 {% endif %}
             </div>
 
@@ -124,53 +109,43 @@
                     <i class="bi bi-bank"></i> Financials
                 </a>
                 <a class="nav-link {% if 'evidence' in request.path %}active{% endif %}" href="{% url 'evidence:evidence_list' %}">
-                    <i class="bi bi-file-earmark-lock"></i> Evidence Locker
+                    <i class="bi bi-file-earmark-lock"></i> Evidence
                 </a>
                 <a class="nav-link {% if 'communication' in request.path %}active{% endif %}" href="{% url 'communication:message_list' %}">
                     <i class="bi bi-chat-left-text"></i> Secure Comms
-                    {% if request.case and request.case.messages.count > 0 %}
-                    <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.7rem;">{{ request.case.messages.count }}</span>
-                    {% endif %}
                 </a>
             </nav>
             
-            <div class="mt-auto p-3">
-                <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger w-100 btn-sm border-0 text-start ps-3">
-                    <i class="bi bi-box-arrow-right me-2"></i> Sign Out
-                </a>
+            <div class="mt-auto p-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'accounts:profile' %}" class="nav-link text-white-50"><i class="bi bi-gear"></i> Settings</a>
+                <a href="{% url 'accounts:logout' %}" class="nav-link text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
             </div>
         </div>
 
-        <!-- Top Navbar -->
-        <div class="navbar-top d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold brand-font" style="color: var(--text-main);">{% block page_title %}Overview{% endblock %}</h5>
-            
+        <div class="navbar-app d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold brand-font">{% block page_title %}{% endblock %}</h5>
             <div class="d-flex align-items-center gap-3">
-                <!-- Stealth Toggle -->
-                <button class="btn btn-sm btn-light border" onclick="document.body.classList.toggle('stealth-mode')" title="Toggle Privacy Blur">
-                    <i class="bi bi-eye-slash"></i>
-                </button>
-
-                <div class="dropdown">
-                    <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle text-dark" data-bs-toggle="dropdown">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                 <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-decoration-none text-dark fw-bold dropdown-toggle" data-bs-toggle="dropdown">
+                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
                             {{ user.first_name|first|default:"U" }}
                         </div>
+                        {{ user.first_name }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
-                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Settings</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:security_log' %}">Security Log</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">Logout</a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Sign Out</a></li>
                     </ul>
-                </div>
+                 </div>
             </div>
         </div>
 
-        <!-- Main Content Area -->
         <div class="main-content">
             {% if messages %}
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -181,7 +156,7 @@
         </div>
 
     {% else %}
-        <!-- LANDING / AUTH LAYOUT (Full Width) -->
+        <!-- ================= PUBLIC LAYOUT ================= -->
         <div class="landing-wrapper">
             {% block landing_content %}{% endblock %}
         </div>
