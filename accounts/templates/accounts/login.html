@@ -3,74 +3,81 @@
 
 {% block title %}Client Access | Exit Protocol{% endblock %}
 
-{# Use landing_content because user is NOT authenticated yet #}
+{# --- FIX: Must use landing_content because user is logged out --- #}
 {% block landing_content %}
-<div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f8fafc;">
-    <div class="col-md-5 col-lg-4">
-        <div class="text-center mb-4">
-            <h3 class="brand-font fw-bold text-dark">EXIT<span style="color: #b45309;">PROTOCOL</span></h3>
-        </div>
-        
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-            <div class="card-header bg-dark text-white text-center py-4">
-                <h5 class="fw-bold mb-0 text-uppercase ls-1" style="font-size: 0.9rem;">Secure Client Access</h5>
-            </div>
-            <div class="card-body p-4 p-md-5 bg-white">
+<div class="d-flex align-items-center min-vh-100" style="background-color: #f8fafc;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="text-center mb-4">
+                    <h4 class="brand-font fw-bold text-dark fs-3">EXIT<span style="color: #b45309;">PROTOCOL</span></h4>
+                </div>
                 
-                {# Display Non-Field Errors (Global Form Errors) #}
-                {% if form.non_field_errors %}
-                <div class="alert alert-danger small shadow-sm mb-4 border-0 bg-danger bg-opacity-10 text-danger">
-                    <i class="bi bi-exclamation-circle-fill me-2"></i> {{ form.non_field_errors.0 }}
-                </div>
-                {% endif %}
-
-                {# Display Field Specific Errors if any #}
-                {% if form.errors and not form.non_field_errors %}
-                 <div class="alert alert-danger small shadow-sm mb-4 border-0 bg-danger bg-opacity-10 text-danger">
-                    <i class="bi bi-exclamation-circle-fill me-2"></i> Please correct the errors below.
-                </div>
-                {% endif %}
-
-                <form method="post" action="{% url 'accounts:login' %}">
-                    {% csrf_token %}
-                    
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Email Identity</label>
-                        {% render_field form.email class="form-control form-control-lg bg-light border-0" placeholder="name@example.com" %}
-                        {% if form.email.errors %}
-                            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white text-center py-4">
+                        <h5 class="fw-bold mb-0 text-uppercase ls-1" style="font-size: 0.9rem;">Secure Client Access</h5>
+                    </div>
+                    <div class="card-body p-4 p-md-5 bg-white">
+                        
+                        {# Display Messages (Invalid Email/Password) #}
+                        {% if messages %}
+                            {% for message in messages %}
+                            <div class="alert alert-danger small shadow-sm mb-4 border-0 bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-exclamation-circle-fill me-2"></i> {{ message }}
+                            </div>
+                            {% endfor %}
                         {% endif %}
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold text-uppercase text-muted">Passkey</label>
-                        {% render_field form.password class="form-control form-control-lg bg-light border-0" placeholder="••••••••" %}
-                        {% if form.password.errors %}
-                            <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+
+                        {# Display Form Errors #}
+                        {% if form.errors %}
+                             {% for field in form %}
+                                {% for error in field.errors %}
+                                <div class="alert alert-danger small shadow-sm mb-2 border-0 bg-danger bg-opacity-10 text-danger">
+                                    {{ error }}
+                                </div>
+                                {% endfor %}
+                             {% endfor %}
+                             {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger small shadow-sm mb-2 border-0 bg-danger bg-opacity-10 text-danger">
+                                    {{ error }}
+                                </div>
+                             {% endfor %}
                         {% endif %}
-                    </div>
 
-                    <!-- Hidden 'next' field to handle redirection after login -->
-                    <input type="hidden" name="next" value="{{ request.GET.next }}">
+                        <form method="post">
+                            {% csrf_token %}
+                            
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Email Identity</label>
+                                {% render_field form.email class="form-control form-control-lg bg-light border-0" placeholder="name@example.com" %}
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Passkey</label>
+                                {% render_field form.password class="form-control form-control-lg bg-light border-0" placeholder="••••••••" %}
+                            </div>
 
-                    <div class="d-grid mt-5">
-                        <button type="submit" class="btn btn-dark btn-lg shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
-                            Authenticate
-                        </button>
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-dark btn-lg shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
+                                    Authenticate
+                                </button>
+                            </div>
+                        </form>
                     </div>
-                </form>
+                    <div class="card-footer bg-light text-center py-3 border-top-0">
+                        <small class="text-muted">
+                            New case file? <a href="{% url 'accounts:register' %}" class="fw-bold text-dark text-decoration-none">Initialize Audit</a>
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <small class="text-muted opacity-75" style="font-size: 0.7rem;">
+                        <i class="bi bi-shield-lock-fill me-1"></i> 
+                        256-bit Encryption Active
+                    </small>
+                </div>
             </div>
-            <div class="card-footer bg-light text-center py-3 border-top-0">
-                <small class="text-muted">
-                    No account? <a href="{% url 'accounts:register' %}" class="fw-bold text-dark text-decoration-none">Initialize Audit</a>
-                </small>
-            </div>
-        </div>
-        <div class="text-center mt-4">
-            <small class="text-muted opacity-75" style="font-size: 0.7rem;">
-                <i class="bi bi-shield-lock-fill me-1"></i> 
-                256-bit Encryption Active
-            </small>
         </div>
     </div>
 </div>
