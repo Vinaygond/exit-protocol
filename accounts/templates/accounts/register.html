@@ -3,70 +3,59 @@
 
 {% block title %}Initialize Audit | Exit Protocol{% endblock %}
 
-{# --- FIX: Changed block name to 'landing_content' --- #}
 {% block landing_content %}
-<div class="d-flex align-items-center min-vh-100" style="background-color: #f8fafc;">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="text-center mb-4">
-                    <h4 class="brand-font fw-bold text-dark fs-3">EXIT<span style="color: #b45309;">PROTOCOL</span></h4>
-                </div>
+<div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f8fafc;">
+    <div class="col-md-6 col-lg-5">
+        <div class="text-center mb-4">
+            <h3 class="brand-font fw-bold text-dark">EXIT<span style="color: #b45309;">PROTOCOL</span></h3>
+        </div>
 
-                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                    <div class="card-header bg-warning text-dark text-center py-4">
-                        <h5 class="fw-bold mb-0 text-uppercase ls-1" style="font-size: 0.9rem;">Initialize Case File</h5>
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="card-header bg-warning text-dark text-center py-4">
+                <h5 class="fw-bold mb-0 text-uppercase ls-1" style="font-size: 0.9rem;">Initialize Case File</h5>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-white">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">First Name</label>
+                            {% render_field form.first_name class="form-control bg-light border-0" %}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Last Name</label>
+                            {% render_field form.last_name class="form-control bg-light border-0" %}
+                        </div>
                     </div>
-                    <div class="card-body p-4 p-md-5 bg-white">
-                        
-                        <form method="post">
-                            {% csrf_token %}
-                            
-                            <div class="row g-3 mb-3">
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-uppercase text-muted">First Name</label>
-                                    {% render_field form.first_name class="form-control bg-light border-0" %}
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label small fw-bold text-uppercase text-muted">Last Name</label>
-                                    {% render_field form.last_name class="form-control bg-light border-0" %}
-                                </div>
-                            </div>
 
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-uppercase text-muted">Email Address</label>
-                                {% render_field form.email class="form-control bg-light border-0" %}
-                                {% if form.email.errors %}
-                                    <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label small fw-bold text-uppercase text-muted">Password</label>
-                                {% render_field form.password class="form-control bg-light border-0" placeholder="Min. 12 characters" %}
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label class="form-label small fw-bold text-uppercase text-muted">Confirm Password</label>
-                                {% render_field form.password_confirm class="form-control bg-light border-0" %}
-                                {% if form.non_field_errors %}
-                                    <div class="alert alert-danger small mt-2">{{ form.non_field_errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <div class="d-grid gap-2 mt-4">
-                                <button type="submit" class="btn btn-dark btn-lg shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
-                                    Create Secure Account
-                                </button>
-                            </div>
-                        </form>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Email Address</label>
+                        {% render_field form.email class="form-control bg-light border-0" %}
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
                     </div>
-                    <div class="card-footer bg-light text-center py-3 border-top-0">
-                        <small class="text-muted">
-                            Existing client? <a href="{% url 'accounts:login' %}" class="fw-bold text-dark text-decoration-none">Access Portal</a>
-                        </small>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Password</label>
+                        {% render_field form.password class="form-control bg-light border-0" placeholder="Min. 12 characters" %}
                     </div>
-                </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-uppercase text-muted">Confirm Password</label>
+                        {% render_field form.password_confirm class="form-control bg-light border-0" %}
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-dark btn-lg shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
+                            Create Secure Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer bg-light text-center py-3 border-top-0">
+                <small class="text-muted">
+                    Existing client? <a href="{% url 'accounts:login' %}" class="fw-bold text-dark text-decoration-none">Access Portal</a>
+                </small>
             </div>
         </div>
     </div>
