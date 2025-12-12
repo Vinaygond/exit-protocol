@@ -3,6 +3,7 @@
 
 {% block title %}Client Access | Exit Protocol{% endblock %}
 
+{# Use landing_content because user is NOT authenticated yet #}
 {% block landing_content %}
 <div class="d-flex align-items-center justify-content-center min-vh-100" style="background-color: #f8fafc;">
     <div class="col-md-5 col-lg-4">
@@ -15,24 +16,42 @@
                 <h5 class="fw-bold mb-0 text-uppercase ls-1" style="font-size: 0.9rem;">Secure Client Access</h5>
             </div>
             <div class="card-body p-4 p-md-5 bg-white">
-                {% if form.errors %}
+                
+                {# Display Non-Field Errors (Global Form Errors) #}
+                {% if form.non_field_errors %}
                 <div class="alert alert-danger small shadow-sm mb-4 border-0 bg-danger bg-opacity-10 text-danger">
-                    <i class="bi bi-exclamation-circle-fill me-2"></i> Invalid credentials.
+                    <i class="bi bi-exclamation-circle-fill me-2"></i> {{ form.non_field_errors.0 }}
                 </div>
                 {% endif %}
 
-                <form method="post">
+                {# Display Field Specific Errors if any #}
+                {% if form.errors and not form.non_field_errors %}
+                 <div class="alert alert-danger small shadow-sm mb-4 border-0 bg-danger bg-opacity-10 text-danger">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i> Please correct the errors below.
+                </div>
+                {% endif %}
+
+                <form method="post" action="{% url 'accounts:login' %}">
                     {% csrf_token %}
                     
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Email Identity</label>
                         {% render_field form.email class="form-control form-control-lg bg-light border-0" placeholder="name@example.com" %}
+                        {% if form.email.errors %}
+                            <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                        {% endif %}
                     </div>
                     
                     <div class="mb-4">
                         <label class="form-label small fw-bold text-uppercase text-muted">Passkey</label>
                         {% render_field form.password class="form-control form-control-lg bg-light border-0" placeholder="••••••••" %}
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+                        {% endif %}
                     </div>
+
+                    <!-- Hidden 'next' field to handle redirection after login -->
+                    <input type="hidden" name="next" value="{{ request.GET.next }}">
 
                     <div class="d-grid mt-5">
                         <button type="submit" class="btn btn-dark btn-lg shadow-sm fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">
@@ -46,6 +65,12 @@
                     No account? <a href="{% url 'accounts:register' %}" class="fw-bold text-dark text-decoration-none">Initialize Audit</a>
                 </small>
             </div>
+        </div>
+        <div class="text-center mt-4">
+            <small class="text-muted opacity-75" style="font-size: 0.7rem;">
+                <i class="bi bi-shield-lock-fill me-1"></i> 
+                256-bit Encryption Active
+            </small>
         </div>
     </div>
 </div>
