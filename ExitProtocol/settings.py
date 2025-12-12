@@ -13,7 +13,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-h9v@$fq$4#-@$767z5a!4
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Allowed Hosts: Mandatory for production
-ALLOWED_HOSTS = config('exitprotocols.com', default='localhost,127.0.0.1,.onrender.com,.railway.app', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com,exitprotocols.com,www.exitprotocols.com', cast=Csv())
 
 # Application definition
 INSTALLED_APPS = [
