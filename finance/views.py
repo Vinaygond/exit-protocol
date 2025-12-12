@@ -6,9 +6,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Sum, Count, Q
-from decimal import Decimal
 from django.utils import timezone
+from decimal import Decimal
 import hashlib
+import uuid  # <--- Essential for manual transaction IDs
 
 from finance.models import (
     FinancialAccount, Transaction, SeparatePropertyClaim, BalanceSnapshot
@@ -22,8 +23,7 @@ from finance.tasks import recalculate_libr_for_account, bulk_import_transactions
 from cases.models import CaseParty
 from evidence.models import EvidenceDocument
 from .services.statement_parser import StatementParser
-from core.utils import render_to_pdf  # <--- Essential for PDF Export
-from subscriptions.decorators import premium_required
+from core.utils import render_to_pdf
 
 
 @login_required
@@ -118,7 +118,7 @@ def account_create(request):
 
 @login_required
 def transaction_create(request, account_id):
-    """Create a new transaction"""
+    """Create a new transaction (Manual Entry)"""
     case = request.case
     account = get_object_or_404(FinancialAccount, id=account_id, case=case)
     
@@ -128,6 +128,11 @@ def transaction_create(request, account_id):
             transaction = form.save(commit=False)
             transaction.case = case
             transaction.account = account
+            
+            # FIX: Generate a unique ID for manual entries
+            # This prevents "UNIQUE constraint failed" errors
+            transaction.external_id = f"manual_{uuid.uuid4().hex}"
+            
             transaction.save()
             
             # Trigger LIBR recalculation
@@ -339,7 +344,6 @@ def balance_chart_data(request, account_id):
     return JsonResponse(data)
 
 @login_required
-@premium_required
 def process_statement(request, document_id):
     """
     Trigger OCR/Parsing.
@@ -348,12 +352,9 @@ def process_statement(request, document_id):
     case = request.case
     document = get_object_or_404(EvidenceDocument, id=document_id, case=case)
     
-    print(f"\n--- PROCESSING DOCUMENT: {document.original_filename} ---")
-
     # 1. Select Target Account
     target_account = FinancialAccount.objects.filter(case=case, is_active=True).first()
     if not target_account:
-        print("ERROR: No financial account found.")
         messages.error(request, "Create a Financial Account first to link this statement.")
         return redirect('finance:account_create')
 
@@ -364,7 +365,6 @@ def process_statement(request, document_id):
         
         # --- FAILSAFE MODE ---
         if not transactions_data:
-            print("WARNING: Parser found 0 transactions. Engaging Failsafe Mode.")
             transactions_data = [
                 {'transaction_date': '2025-01-15', 'description': 'Opening Balance', 'amount': Decimal('0.00')},
                 {'transaction_date': '2025-01-20', 'description': 'Inheritance Transfer (Sep Prop)', 'amount': Decimal('100000.00')},
@@ -373,17 +373,14 @@ def process_statement(request, document_id):
             ]
             messages.warning(request, "PDF format was ambiguous. Extracted data using heuristic fallback (Demo Mode).")
         else:
-            print(f"SUCCESS: Parser returned {len(transactions_data)} rows.")
             messages.success(request, f"Successfully extracted {len(transactions_data)} transactions.")
 
         # 3. Save to Database with UNIQUE HASH
         count = 0
         for data in transactions_data:
-            # Generate a unique ID based on the content (Date + Desc + Amount)
             unique_string = f"{data['transaction_date']}-{data['amount']}-{data['description']}"
             tx_hash = hashlib.md5(unique_string.encode('utf-8')).hexdigest()
             
-            # Check if this exact transaction already exists
             if not Transaction.objects.filter(account=target_account, external_id=tx_hash).exists():
                 Transaction.objects.create(
                     case=case,
@@ -398,21 +395,16 @@ def process_statement(request, document_id):
                 count += 1
             
         if count > 0:
-            # Update account balance (Simple sum for demo)
             total = Transaction.objects.filter(account=target_account).aggregate(Sum('amount'))['amount__sum'] or 0
             target_account.current_balance = total
             target_account.save()
             
-        print(f"DATABASE: Saved {count} new transactions to Account ID {target_account.id}")
-
     except Exception as e:
-        print(f"CRITICAL EXCEPTION: {e}")
         messages.error(request, f"Processing failed: {str(e)}")
 
     return redirect('finance:account_detail', account_id=target_account.id)
 
 @login_required
-@premium_required
 def export_claim_pdf(request, claim_id):
     """
     Generate a formal PDF report for a forensic claim.
