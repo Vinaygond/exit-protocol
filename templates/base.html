@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Exit Protocol{% endblock %}</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
-    <!-- Fonts: Inter (UI) & Playfair Display (Headers) -->
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -37,16 +38,18 @@
             border-right: 1px solid rgba(255,255,255,0.05);
             z-index: 1000;
             padding-top: 20px;
+            overflow-y: auto; /* Scrollable sidebar */
         }
         
         .sidebar .nav-link {
             color: #94a3b8; margin: 4px 12px; padding: 12px 20px; border-radius: 6px;
             transition: all 0.2s; font-weight: 500;
+            display: flex; align-items: center; text-decoration: none;
         }
         .sidebar .nav-link:hover, .sidebar .nav-link.active {
             background-color: rgba(255,255,255,0.1); color: white;
         }
-        .sidebar i { margin-right: 12px; }
+        .sidebar i { margin-right: 12px; font-size: 1.1rem; }
 
         .main-content {
             margin-left: var(--sidebar-width);
@@ -74,6 +77,8 @@
             background-color: var(--gold-accent); color: white; border: none; font-weight: 600;
         }
         .btn-gold:hover { background-color: #92400e; color: white; }
+        
+        .cursor-pointer { cursor: pointer; }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -86,15 +91,19 @@
                 <span class="brand-font fw-bold fs-4 text-white">EXIT<span style="color: var(--gold-accent);">PROTOCOL</span></span>
             </div>
             
-            <!-- Case Info -->
+            <!-- Dynamic Case Selector -->
             <div class="mx-3 mb-4 p-3 rounded-3" style="background: rgba(255,255,255,0.05);">
                 <small class="d-block text-uppercase text-muted" style="font-size: 0.65rem;">Active Case</small>
                 {% if request.case %}
-                    <div class="text-white fw-bold text-truncate cursor-pointer" onclick="window.location.href='{% url 'cases:select_case' %}'">
-                        {{ request.case.case_number }} <i class="bi bi-chevron-down ms-1" style="font-size: 0.7rem;"></i>
+                    <div class="d-flex justify-content-between align-items-center cursor-pointer mt-1" onclick="window.location.href='{% url 'cases:select_case' %}'">
+                        <span class="text-white fw-bold text-truncate" style="max-width: 140px;">{{ request.case.case_number }}</span>
+                        <i class="bi bi-chevron-expand text-white-50" style="font-size: 0.8rem;"></i>
                     </div>
+                    <small class="text-white-50 text-truncate d-block mt-1">{{ request.case.case_title }}</small>
                 {% else %}
-                    <a href="{% url 'cases:case_create' %}" class="text-warning text-decoration-none fw-bold small">+ Initialize Case</a>
+                    <a href="{% url 'cases:case_create' %}" class="text-warning text-decoration-none fw-bold small d-block mt-1">
+                        <i class="bi bi-plus-circle me-1"></i> Initialize Case
+                    </a>
                 {% endif %}
             </div>
 
@@ -113,6 +122,9 @@
                 </a>
                 <a class="nav-link {% if 'communication' in request.path %}active{% endif %}" href="{% url 'communication:message_list' %}">
                     <i class="bi bi-chat-left-text"></i> Secure Comms
+                    {% if request.case and request.case.messages.count > 0 %}
+                    <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.7rem;">{{ request.case.messages.count }}</span>
+                    {% endif %}
                 </a>
             </nav>
             
@@ -122,30 +134,41 @@
             </div>
         </div>
 
+        <!-- Top Navbar -->
         <div class="navbar-app d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold brand-font">{% block page_title %}{% endblock %}</h5>
             <div class="d-flex align-items-center gap-3">
+                 <!-- Notifications -->
+                 <button class="btn btn-light btn-sm rounded-circle position-relative border">
+                    <i class="bi bi-bell"></i>
+                    {% if messages %}
+                    <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+                    {% endif %}
+                 </button>
+
+                 <!-- User Dropdown -->
                  <div class="dropdown">
                     <a href="#" class="d-flex align-items-center text-decoration-none text-dark fw-bold dropdown-toggle" data-bs-toggle="dropdown">
                         <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
                             {{ user.first_name|first|default:"U" }}
                         </div>
-                        {{ user.first_name }}
+                        <span class="d-none d-sm-inline">{{ user.first_name }}</span>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                         <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profile</a></li>
                         <li><a class="dropdown-item" href="{% url 'accounts:security_log' %}">Security Log</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">Sign Out</a></li>
+                        <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">Sign Out</a></li>
                     </ul>
                  </div>
             </div>
         </div>
 
+        <!-- Content Area -->
         <div class="main-content">
             {% if messages %}
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
@@ -157,6 +180,7 @@
 
     {% else %}
         <!-- ================= PUBLIC LAYOUT ================= -->
+        <!-- Used for Login, Register, and Home pages -->
         <div class="landing-wrapper">
             {% block landing_content %}{% endblock %}
         </div>
