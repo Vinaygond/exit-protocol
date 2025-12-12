@@ -6,7 +6,6 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from django.http import JsonResponse
 from accounts.models import User, UserProfile, LoginHistory
 from accounts.forms import (
     UserRegistrationForm, 
@@ -15,6 +14,14 @@ from accounts.forms import (
     PasswordChangeForm
 )
 
+def get_client_ip(request):
+    """Extract client IP address from request"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
 def register(request):
     """User registration"""
@@ -39,7 +46,7 @@ def register(request):
                 success=True
             )
             
-            # Log them in
+            # Log them in automatically
             login(request, user)
             messages.success(request, 'Account created successfully!')
             return redirect('core:dashboard')
@@ -60,23 +67,15 @@ def user_login(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             
-            try:
-                user = User.objects.get(email=email)
-                
-                # Check if account is locked
-                if user.is_locked_out():
-                    messages.error(
-                        request, 
-                        'Account temporarily locked due to failed login attempts. '
-                        'Please try again in 30 minutes.'
-                    )
-                    return render(request, 'accounts/login.html', {'form': form})
-                
-                # Authenticate
-                user_auth = authenticate(request, username=email, password=password)
-                
-                if user_auth is not None:
+            # Authenticate
+            user = authenticate(request, username=email, password=password)
+            
+            if user is not None:
+                if user.is_active:
                     # Successful login
+                    login(request, user)
+                    
+                    # Reset failed login counter
                     user.reset_failed_login()
                     user.last_login = timezone.now()
                     user.save()
@@ -89,23 +88,30 @@ def user_login(request):
                         success=True
                     )
                     
-                    login(request, user_auth)
-                    
                     next_url = request.GET.get('next', 'core:dashboard')
                     return redirect(next_url)
                 else:
-                    # Failed login
-                    user.increment_failed_login()
+                    messages.error(request, 'Account is disabled.')
+            else:
+                # Failed login logic
+                try:
+                    user_obj = User.objects.get(email=email)
+                    user_obj.increment_failed_login()
+                    
                     LoginHistory.objects.create(
-                        user=user,
+                        user=user_obj,
                         ip_address=get_client_ip(request),
                         user_agent=request.META.get('HTTP_USER_AGENT', '')[:512],
                         success=False
                     )
+                    
+                    if user_obj.is_locked_out():
+                        messages.error(request, 'Account temporarily locked due to failed login attempts.')
+                    else:
+                        messages.error(request, 'Invalid email or password.')
+                except User.DoesNotExist:
+                    # Don't reveal user existence
                     messages.error(request, 'Invalid email or password.')
-            
-            except User.DoesNotExist:
-                messages.error(request, 'Invalid email or password.')
     else:
         form = UserLoginForm()
     
@@ -133,28 +139,30 @@ def profile(request):
         if form.is_valid():
             form.save()
             
-            # Update user info
-            request.user.first_name = form.cleaned_data.get('first_name', request.user.first_name)
-            request.user.last_name = form.cleaned_data.get('last_name', request.user.last_name)
-            request.user.phone_number = form.cleaned_data.get('phone_number', request.user.phone_number)
-            request.user.save()
+            # Update user info (First/Last name are on User model, not Profile)
+            user = request.user
+            user.first_name = form.cleaned_data.get('first_name', user.first_name)
+            user.last_name = form.cleaned_data.get('last_name', user.last_name)
+            user.phone_number = form.cleaned_data.get('phone_number', user.phone_number)
+            user.save()
             
             messages.success(request, 'Profile updated successfully!')
             return redirect('accounts:profile')
     else:
-        form = UserProfileForm(instance=user_profile)
+        # Pre-populate form with User data
+        initial_data = {
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'phone_number': request.user.phone_number,
+        }
+        form = UserProfileForm(instance=user_profile, initial=initial_data)
     
-    # Get recent login history
-    recent_logins = LoginHistory.objects.filter(
-        user=request.user
-    ).order_by('-timestamp')[:10]
+    recent_logins = LoginHistory.objects.filter(user=request.user).order_by('-timestamp')[:10]
     
-    context = {
+    return render(request, 'accounts/profile.html', {
         'form': form,
-        'recent_logins': recent_logins,
-    }
-    
-    return render(request, 'accounts/profile.html', context)
+        'recent_logins': recent_logins
+    })
 
 
 @login_required
@@ -182,21 +190,5 @@ def change_password(request):
 @login_required
 def security_log(request):
     """View security activity log"""
-    login_history = LoginHistory.objects.filter(
-        user=request.user
-    ).order_by('-timestamp')[:50]
-    
-    return render(request, 'accounts/security_log.html', {
-        'login_history': login_history
-    })
-
-
-def get_client_ip(request):
-    """Extract client IP address from request"""
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
-
+    login_history = LoginHistory.objects.filter(user=request.user).order_by('-timestamp')[:50]
+    return render(request, 'accounts/security_log.html', {'login_history': login_history})
